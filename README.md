@@ -47,6 +47,8 @@ Then load the extension:
 
 No web server or store publication is needed for local use.
 
+For a guided first run, expected screens, a rebuild/reload exercise, and troubleshooting, follow [First launch in Brave](docs/first-launch.md).
+
 ### Development loop
 
 ```sh

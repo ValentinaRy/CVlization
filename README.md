@@ -6,7 +6,7 @@ CVlization (*CV + civilization*) is a local-first browser companion for job appl
 
 Built as a learning project with TypeScript and browser extensions, with public development on GitHub. Desktop Chromium browsers are the target, with Brave as the primary test browser.
 
-> 🚩 **Current stage: 01 — Foundations.** The repository and extension shell are ready. Profile storage, autofill, tracking, and document generation are not implemented yet.
+> 🚩 **Current stage: 02 — Local workspace.** A first JSON write/read experiment is available. Profile storage, autofill, tracking, and document generation are not implemented yet.
 
 ## The idea
 
@@ -22,11 +22,12 @@ The core workflow is intended to run without an account or our own backend. Opti
 ## What works today
 
 - A Manifest V3 extension shell with a toolbar popup and a full-tab dashboard.
+- A dashboard experiment that writes a fictional user to a new JSON file in a selected folder and reads it back for visual comparison.
 - TypeScript checking and a Vite build for local installation.
 - A build watcher for development and a package sanity check.
 - A GitHub Actions workflow that checks and builds the project.
 
-The current extension requests no permissions, reads no websites or personal files, and makes no network requests. Its feature cards describe future work.
+The manifest requests no extension permissions. The file experiment asks for folder access through the browser picker and only reads the test file it creates. It makes no network requests and reads no websites. The feature cards describe future work.
 
 ## Run locally
 
@@ -59,7 +60,7 @@ Use DevTools to inspect the dashboard, or right-click the popup and choose **Ins
 
 ### Brave and workspace access
 
-The planned workspace feature may require enabling **File System Access API** at `brave://flags/#file-system-access-api`, followed by a browser restart. This is not needed for the current shell. Workspace access and permissions after restarting Brave will be verified in the next stage.
+The file experiment may require enabling **File System Access API** at `brave://flags/#file-system-access-api`, followed by a browser restart. In the dashboard, choose a dedicated test folder, write the fictional user, and read the file back. Each write creates a new `cvlization-test-user-<id>.json` file. The folder selection lasts only for the current page; reconnecting after restart is planned next.
 
 ## Roadmap
 
@@ -69,8 +70,8 @@ Keep exactly one flag in the table. When work starts on the next stage, mark the
 
 | Stage | Status | Outcome |
 | --- | --- | --- |
-| 01 · Foundations | 🚩 Current | Project structure, installable shell, build workflow, and first manual Brave smoke check. |
-| 02 · Local workspace | ⬜ Upcoming | Choose a folder; read/write versioned JSON; reconnect after restart; register documents with relative paths. |
+| 01 · Foundations | ✅ Completed | Project structure, installable shell, build workflow, and first manual Brave smoke check. |
+| 02 · Local workspace | 🚩 Current | Choose a folder; read/write versioned JSON; reconnect after restart; register documents with relative paths. |
 | 03 · Profile and autofill | ⬜ Upcoming | Edit career history; fill supported forms by click; handle repeated experience blocks and dates on one platform; offer manual field mapping. |
 | 04 · Application archive | ⬜ Upcoming | Save vacancies and submission snapshots; track dates, notes, and statuses; browse a fast overview backed by a rebuildable index. |
 | 05 · Cover letters | ⬜ Upcoming | Multiple named/language-specific templates; optional copy-and-paste AI prompt workflow; variable substitution, editing, local PDF generation, and supported file uploads. |

@@ -76,3 +76,19 @@ footer p { margin-bottom: 6px; }
 @media (forced-colors: active) {
   .popup button { border: 1px solid ButtonText; }
 }
+
+.workspace-experiment { margin-top: 32px; padding: 28px; border: 1px solid var(--color-border); border-radius: var(--radius-card); background: var(--color-surface); box-shadow: var(--shadow-soft); }
+.experiment-actions { display: flex; flex-wrap: wrap; gap: 12px; margin: 24px 0; }
+.experiment-actions button { padding: 12px 18px; border: 1px solid var(--color-accent); border-radius: var(--radius-control); background: var(--color-accent); color: var(--color-on-accent); }
+.experiment-actions button:hover:not(:disabled) { background: var(--color-accent-hover); }
+.experiment-actions button:disabled { cursor: not-allowed; color: var(--color-muted); background: var(--color-lilac); border-color: var(--color-border); }
+#test-location { overflow-wrap: anywhere; }
+.json-comparison { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; margin-top: 24px; }
+.json-comparison h3 { font-size: .9rem; margin: 0 0 10px; }
+.json-comparison pre { margin: 0; padding: 18px; border: 1px solid var(--color-border); border-radius: var(--radius-control); background: var(--color-blue); font-size: .85rem; white-space: pre-wrap; overflow-wrap: anywhere; }
+.json-comparison > :first-child pre { background: var(--color-pink); }
+@media (max-width: 650px) {
+  .workspace-experiment { padding: 20px; }
+  .json-comparison { grid-template-columns: 1fr; }
+  .experiment-actions { flex-direction: column; }
+}

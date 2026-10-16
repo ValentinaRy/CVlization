@@ -17,19 +17,42 @@
         <p class="lead">One profile. Your documents. A clearer view of your job search.</p>
       </section>
       <section class="stage" aria-labelledby="stage-title">
-        <span class="stage-number" aria-hidden="true">01</span>
+        <span class="stage-number" aria-hidden="true">02</span>
         <div>
           <p class="eyebrow">🚩 Current stage</p>
-          <h2 id="stage-title">Foundations</h2>
-          <p>The extension shell is ready. Workspace access, autofill, and tracking are planned next.</p>
+          <h2 id="stage-title">Local workspace</h2>
+          <p>Our first small step: write a fictional profile to a folder and read it back.</p>
         </div>
+      </section>
+      <section class="workspace-experiment" aria-labelledby="experiment-title">
+        <p class="eyebrow">A small experiment</p>
+        <h2 id="experiment-title">A little home for your data</h2>
+        <p>Choose a dedicated test folder, write the fictional user below, then read the file back and compare the values.</p>
+        <div class="experiment-actions" aria-label="File experiment actions">
+          <button id="choose-test-folder" type="button">1. Choose folder</button>
+          <button id="write-test-file" type="button" disabled>2. Write test file</button>
+          <button id="read-test-file" type="button" disabled>3. Read test file</button>
+        </div>
+        <p id="test-location" class="note">No folder selected.</p>
+        <p id="test-status" class="note" role="status" aria-live="polite">Start by choosing a test folder.</p>
+        <div class="json-comparison">
+          <div>
+            <h3 id="source-title">Source · fictional user</h3>
+            <pre id="test-source" aria-labelledby="source-title"></pre>
+          </div>
+          <div>
+            <h3 id="result-title">Read from file</h3>
+            <pre id="test-result" aria-labelledby="result-title">No file read yet.</pre>
+          </div>
+        </div>
+        <p class="note">Each write creates a new test file. Reopening this page resets the selection; files remain in your folder.</p>
       </section>
       <section class="feature-grid" aria-label="Planned features">
         <article><p class="eyebrow">Planned</p><h2>Your profile</h2><p>Keep experience, education, and documents together in a folder you choose.</p></article>
         <article><p class="eyebrow">Planned</p><h2>Your applications</h2><p>Remember where you applied, what you sent, and what happened next.</p></article>
         <article><p class="eyebrow">Planned</p><h2>Your words</h2><p>Turn reusable cover-letter templates into text and PDF documents.</p></article>
       </section>
-      <footer><p id="build-info">CVlization</p><p>This preview does not read websites, access files, or send data.</p></footer>
+      <footer><p id="build-info">CVlization</p><p>Test files stay in the folder you choose. This preview does not read websites or send data.</p></footer>
     </main>
     <script type="module" src="/src/dashboard/main.ts"></script>
   </body>

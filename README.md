@@ -22,12 +22,13 @@ The core workflow is intended to run without an account or our own backend. Opti
 ## What works today
 
 - A Manifest V3 extension shell with a toolbar popup and a full-tab dashboard.
+- A workspace connection panel that remembers the selected folder in this browser, checks access on reopening, and offers Reconnect when permission is needed.
 - A dashboard experiment that writes a fictional user to a new JSON file in a selected folder and reads it back for visual comparison.
 - TypeScript checking and a Vite build for local installation.
 - A build watcher for development and a package sanity check.
 - A GitHub Actions workflow that checks and builds the project.
 
-The manifest requests no extension permissions. The file experiment asks for folder access through the browser picker and only reads the test file it creates. It makes no network requests and reads no websites. The feature cards describe future work.
+The manifest requests no extension permissions. Workspace access is granted through the browser picker. The extension remembers a directory handle in local browser storage, checks folder availability, and reads the test files it creates. Profile data is not stored in the browser. It makes no network requests and reads no websites. The feature cards describe future work.
 
 ## Run locally
 
@@ -60,7 +61,7 @@ Use DevTools to inspect the dashboard, or right-click the popup and choose **Ins
 
 ### Brave and workspace access
 
-The file experiment may require enabling **File System Access API** at `brave://flags/#file-system-access-api`, followed by a browser restart. In the dashboard, choose a dedicated test folder, write the fictional user, and read the file back. Each write creates a new `cvlization-test-user-<id>.json` file. The folder selection lasts only for the current page; reconnecting after restart is planned next.
+The file experiment may require enabling **File System Access API** at `brave://flags/#file-system-access-api`, followed by a browser restart. In the dashboard, choose a dedicated test folder, write the fictional user, and read the file back. Each write creates a new `cvlization-test-user-<id>.json` file. The folder handle is remembered in this browser. After reopening or restarting, check the folder name and connection state; use **Reconnect** to grant access again, or **Choose folder** if the folder cannot be restored. Clearing extension storage may require selecting it again. The experiment's last test file is remembered only in the current tab, so write a new test file before reading after reopening.
 
 ## Roadmap
 

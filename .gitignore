@@ -1,0 +1,24 @@
+# Private working notes and AI context
+.ai/
+
+# Dependencies and generated output
+node_modules/
+dist/
+coverage/
+*.tsbuildinfo
+*.log
+
+# Local configuration and credentials
+.env
+.env.*
+!.env.example
+
+# Personal application data belongs outside this repository
+workspace/
+personal-data/
+
+# Editor and operating system files
+.DS_Store
+.idea/
+.vscode/*
+!.vscode/extensions.json

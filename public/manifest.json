@@ -1,0 +1,14 @@
+{
+  "manifest_version": 3,
+  "name": "CVlization",
+  "version": "0.1.0",
+  "description": "A local-first companion for your job search. Early development preview.",
+  "action": {
+    "default_title": "CVlization",
+    "default_popup": "popup.html"
+  },
+  "options_ui": {
+    "page": "dashboard.html",
+    "open_in_tab": true
+  }
+}

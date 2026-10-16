@@ -1,0 +1,22 @@
+{
+  "name": "cvlization",
+  "version": "0.1.0",
+  "private": true,
+  "description": "A local-first browser companion for job applications.",
+  "type": "module",
+  "engines": {
+    "node": ">=24.0.0"
+  },
+  "scripts": {
+    "dev": "vite build --watch --mode development",
+    "typecheck": "tsc --noEmit",
+    "build": "npm run typecheck && vite build",
+    "check:dist": "node scripts/check-dist.mjs"
+  },
+  "devDependencies": {
+    "@types/chrome": "0.3.5",
+    "@types/node": "24.19.2",
+    "typescript": "7.0.2",
+    "vite": "8.3.4"
+  }
+}

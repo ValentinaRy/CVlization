@@ -8,6 +8,9 @@ button?.addEventListener('click', async () => {
     await chrome.runtime.openOptionsPage();
     window.close();
   } catch {
-    if (status) status.textContent = 'Could not open CVlization. Reload the extension and try again.';
+    if (status) {
+      status.dataset.state = 'error';
+      status.textContent = 'Could not open CVlization. Reload the extension and try again.';
+    }
   }
 });

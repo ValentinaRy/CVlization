@@ -2,7 +2,7 @@
 
 ## Current scaffold
 
-CVlization is a Manifest V3 extension built with TypeScript and Vite. It currently contains a toolbar popup and a dashboard that opens in a browser tab. It requests no permissions and has no network calls, background worker, website scripts, or persistence yet.
+CVlization is a Manifest V3 extension built with TypeScript and Vite. It currently contains a toolbar popup and a dashboard that opens in a browser tab. Its manifest requests no extension permissions. It has no network calls, background worker, or website scripts. A small dashboard experiment uses the browser folder picker to write and read a fictional JSON record; production profile persistence is not implemented yet.
 
 Vite compiles two HTML entry points into `dist/` and copies `public/manifest.json` unchanged. Type checking runs separately before production builds. Development uses a build watcher rather than a web server so the output can be loaded as an unpacked extension.
 
@@ -10,6 +10,7 @@ Vite compiles two HTML entry points into `dist/` and copies `public/manifest.jso
 
 - `popup.html` and `src/popup/main.ts` implement the toolbar popup. Its button opens the extension's options page in a browser tab.
 - `dashboard.html` and `src/dashboard/main.ts` implement that full-tab page. It displays the current development stage and reads the installed version from the manifest.
+- `src/dashboard/workspace-experiment.ts` implements the manual file experiment. Directory and file handles stay in memory for the current page. Each write uses a new test filename and each read fetches the file again from disk.
 - `src/shared/styles.css` supplies the styling for both pages.
 - `public/manifest.json` declares the popup and the full-tab options page. No permissions are requested by the current scaffold.
 

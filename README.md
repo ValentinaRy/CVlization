@@ -93,7 +93,7 @@ Broad crawling and automatic submission are not initial requirements. Platform r
 CVlization/
 ├── .github/workflows/     # Continuous integration
 ├── .ai/                  # Private local notes; ignored by Git
-├── docs/                 # Architecture and design decisions
+├── docs/                 # Documentation of the current implementation
 ├── public/manifest.json  # Extension metadata, copied into dist/
 ├── scripts/              # Build/package checks
 ├── src/
@@ -108,7 +108,7 @@ CVlization/
 └── vite.config.ts
 ```
 
-Add content scripts, site adapters, and a background worker when their first features need them. See [architecture and planned workspace format](docs/architecture.md).
+See the [current extension architecture](docs/architecture.md). Working design notes remain local; feature scope and acceptance criteria are tracked in GitHub Issues.
 
 ## Data and contribution conventions
 

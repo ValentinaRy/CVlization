@@ -1,23 +1,31 @@
 # Current extension architecture
 
-## Current scaffold
-
-CVlization is a Manifest V3 extension built with TypeScript and Vite. It currently contains a toolbar popup and a dashboard that opens in a browser tab. Its manifest requests no extension permissions. It has no network calls, background worker, or website scripts. A small dashboard experiment uses the browser folder picker to write and read a fictional JSON record; production profile persistence is not implemented yet.
-
-Vite compiles two HTML entry points into `dist/` and copies `public/manifest.json` unchanged. Type checking runs separately before production builds. Development uses a build watcher rather than a web server so the output can be loaded as an unpacked extension.
+CVlization is a Manifest V3 extension built with TypeScript and Vite. It has a toolbar popup, a full-tab dashboard, and a separate basic resume editor. The manifest requests no extension permissions. There are no network calls, background workers, or website scripts.
 
 ## Entry points
 
-- `popup.html` and `src/popup/main.ts` implement the toolbar popup. Its button opens the extension's options page in a browser tab.
-- `dashboard.html` and `src/dashboard/main.ts` implement that full-tab page. It displays the current development stage and reads the installed version from the manifest.
-- `src/dashboard/workspace-experiment.ts` implements the manual file experiment. It renders workspace connection states and the file experiment. The latest test file handle stays in memory for the current page. Each write uses a new test filename and each read fetches the file again from disk.
-- `src/workspace/access.ts` checks read/write permission and folder availability without writing probe files. Permission requests happen only on a Reconnect click; restore and focus checks never prompt.
-- `src/workspace/handle-store.ts` stores only the selected directory handle in IndexedDB. File contents remain in the selected folder. If browser storage cannot restore the handle, the user can select the folder again.
-- `src/shared/styles.css` supplies the styling for both pages.
-- `public/manifest.json` declares the popup and the full-tab options page. No permissions are requested by the current scaffold.
+- `popup.html` / `src/popup/main.ts`: open the dashboard through the extension options page.
+- `dashboard.html` / `src/dashboard/main.ts`: display the development stage and workspace UI. `src/dashboard/workspace.ts` restores folder access and lists JSON files without reading their contents.
+- `resume.html` / `src/resume/main.ts`: edit optional basic details, country name, address, and repeatable social profiles. Derived name/phone values are generated on save and have no controls. A required filename is independent of the professional title. Opening an existing file validates it before enabling editing.
+- `src/shared/styles.css`: shared cotton-candy styling, including form controls.
 
-## Build validation
+Vite bundles all three HTML entry points into `dist/` and copies the manifest. Development uses a build watcher rather than a web server; the browser extension is reloaded manually.
 
-`npm run build` checks TypeScript and creates the extension package. `npm run check:dist` verifies Manifest V3, matching package and manifest versions, and the presence of local page assets. GitHub Actions runs both commands after installing locked dependencies.
+## Data and persistence
 
-This document describes the current implementation. Future feature scope lives in GitHub Issues and the README roadmap; working design notes are maintained locally.
+- `src/workspace/access.ts` checks read/write permission and folder availability. Permission requests happen on an explicit Reconnect action.
+- `src/workspace/handle-store.ts` stores only the selected directory handle in IndexedDB. Resume contents remain in the chosen folder.
+- `src/resume/model.ts` validates the supported local structure, derives combined names and phone numbers, and preserves unedited fields. Current files use root `schemaVersion` and `id`, with JSON Resume-style `basics` nesting and additional name/phone components beside standard fields. External file import is not implemented.
+- `src/resume/filenames.ts` trims filename stems, permits ordinary punctuation, rejects forbidden characters/reserved names, and checks collisions, including case and Unicode normalization aliases.
+- `src/resume/repository.ts` reads fresh file contents and writes only on explicit Save. It checks the loaded file snapshot before updating, aborts unsuccessful writes, and commits through the writable stream's close operation. It attempts to remove an empty newly created file after a failed first write; cleanup can fail if permission is lost.
+- `src/resume/session.ts` tracks the draft and last successful save. A failed save retains the draft; a different filename creates a copy with a new resume identity.
+
+Editor writes are serialized between extension pages with Web Locks. Snapshot checks prevent overwriting already-detected external edits; this is not a filesystem transaction coordinated with other applications. Basic navigation warnings are present, but there is no persistent draft recovery. The editor keeps the workspace handle it opened with and displays its name.
+
+All resume content is optional. Format warnings for email, URLs, and phone codes do not prevent saving a draft. Structural errors, unsafe filenames, and collisions do prevent writes. Successful Save returns to the dashboard and displays a one-time, dismissible notification naming the file. Placeholder examples are never form values. Country-name entry is free text for now; country-code derivation and image/document controls are deferred. Existing image values and untouched country codes are preserved; changing the country name clears a potentially stale code. User text is inserted as text or input values.
+
+## Validation
+
+`npm test` runs Vitest tests for data transformations, validation, naming, and save/failure decisions using fictional fixtures and a filesystem test double. `npm run build` checks TypeScript and bundles the extension. `npm run check:dist` checks Manifest V3, matching versions, and local assets for all three pages. GitHub Actions runs these checks after installing locked dependencies.
+
+Real file permissions, native prompts, and UI acceptance are tested manually by the owner in Brave. This document describes implemented behavior; future feature scope is tracked in GitHub Issues and the README roadmap.

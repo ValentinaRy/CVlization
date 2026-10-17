@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CVlization — Your resume</title>
+  </head>
+  <body>
+    <main class="dashboard editor">
+      <header class="masthead">
+        <a class="brand" href="dashboard.html" data-leave>CV<span>lization</span></a>
+        <a href="dashboard.html" data-leave>Back to workspace</a>
+      </header>
+      <section class="editor-intro" aria-labelledby="editor-title">
+        <p class="eyebrow">A little space for your story</p>
+        <h1 id="editor-title">Your resume</h1>
+        <p>Start anywhere. Every detail can wait until you are ready.</p>
+        <p id="editor-workspace" class="note"></p>
+        <div class="actions"><button id="editor-reconnect" type="button" hidden>Reconnect folder</button></div>
+        <p id="editor-access" class="note" role="status">Opening your workspace…</p>
+        <p id="editor-error" class="note" role="alert" hidden></p>
+      </section>
+      <form id="resume-form" novalidate hidden>
+        <fieldset id="editor-fields">
+          <section class="card" aria-labelledby="file-title">
+            <h2 id="file-title">Give this file a name</h2>
+            <label for="filename">Filename <span class="required-label">(required)</span></label>
+            <div class="filename-input"><input id="filename" name="filename" type="text" required autocomplete="off" aria-describedby="filename-hint filename-error" /><span>.json</span></div>
+            <p id="filename-hint" class="note">Use a name that helps you recognise this resume. The .json extension is added for you.</p>
+            <p id="filename-error" class="note" role="status"></p>
+            <p id="copy-hint" class="note" hidden>Saving with a different filename creates a copy. Your original file stays in the folder.</p>
+          </section>
+          <section class="card" aria-labelledby="basics-title">
+            <p class="eyebrow">The basics</p><h2 id="basics-title">A little about you</h2>
+            <div id="basic-inputs" class="form-grid"></div>
+          </section>
+          <section class="card" aria-labelledby="location-title">
+            <h2 id="location-title">Where you are</h2>
+            <div id="location-inputs" class="form-grid"></div>
+          </section>
+          <section class="card" aria-labelledby="profiles-title">
+            <div class="section-heading"><h2 id="profiles-title">Around the web</h2><button id="add-profile" type="button" class="secondary">Add profile</button></div>
+            <p class="note">Your LinkedIn, GitHub, or other profiles. Add as many as you like.</p>
+            <div id="profile-inputs"></div>
+          </section>
+          <section class="card" aria-labelledby="save-title">
+            <h2 id="save-title">At your own pace</h2>
+            <p>Your resume is written to disk only when you press Save. You can save it with just a filename.</p>
+            <ul id="draft-warnings" class="note" aria-live="polite"></ul>
+            <div class="actions"><button id="save-resume" type="submit">Save</button><span id="save-state" class="badge" role="status">Not saved yet</span></div>
+          </section>
+        </fieldset>
+      </form>
+    </main>
+    <script type="module" src="/src/resume/main.ts"></script>
+  </body>
+</html>

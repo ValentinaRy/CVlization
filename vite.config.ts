@@ -8,6 +8,7 @@ export default defineConfig({
     rolldownOptions: {
       input: {
         dashboard: fileURLToPath(new URL('./dashboard.html', import.meta.url)),
+        resume: fileURLToPath(new URL('./resume.html', import.meta.url)),
         popup: fileURLToPath(new URL('./popup.html', import.meta.url)),
       },
     },

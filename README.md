@@ -1,5 +1,5 @@
 # CVlization
-
+hahaha
 **Less stress. More possibility.**
 
 CVlization (*CV + civilization*) is a local-first browser companion for job applications. The goal is simple: enter your career history once, reuse it across awkward application forms, and keep your documents and application history in a folder you control.

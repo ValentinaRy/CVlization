@@ -1,5 +1,6 @@
+import { formatBulletList, parseBulletList } from './bullet-list';
 import type { Resume } from './model';
-import { formatDateForInput, parseDateInput } from './dates';
+import { dateRangeErrors, formatDateForInput, parseDateInput } from './dates';
 
 export const workTextFields = ['name', 'position', 'location', 'description', 'url', 'summary'] as const;
 export type WorkEntry = Record<string, unknown> & Partial<Record<typeof workTextFields[number] | 'id' | 'startDate' | 'endDate', string>> & {
@@ -14,7 +15,6 @@ export type WorkDraft = Record<typeof workTextFields[number], string> & {
   highlightsText: string;
   source: WorkEntry;
 };
-export type WorkDateErrors = { startDate?: string; endDate?: string };
 
 export function validateWorkEntries(entries: Record<string, unknown>[]): asserts entries is WorkEntry[] {
   const ids = new Set<string>();
@@ -39,38 +39,16 @@ export function workToDraft(entries: WorkEntry[] = []): WorkDraft[] {
     startDate: formatDateForInput(entry.startDate), endDate: formatDateForInput(entry.endDate),
     // Missing dates can also mean an incomplete draft. Never infer current status.
     current: entry.current ?? false,
-    highlightsText: formatHighlights(entry.highlights),
+    highlightsText: formatBulletList(entry.highlights),
     source: structuredClone(entry),
   } as WorkDraft));
 }
 export function newWorkDraft(): WorkDraft { return workToDraft([{}])[0]!; }
 
-export function formatHighlights(highlights: string[] = []): string {
-  return highlights.map(item => `- ${item}`).join('\n');
-}
-
-export function parseHighlights(text: string): string[] {
-  return text.split(/\r\n|\n|\r/)
-    .map(line => line.trim().replace(/^[-*+><#•](?:[ \t]+|$)/u, '').trim())
-    .filter(Boolean);
-}
-export function workDateErrors(draft: WorkDraft): WorkDateErrors {
-  const errors: WorkDateErrors = {};
-  let start: string | undefined;
-  let end: string | undefined;
-  try { start = parseDateInput(draft.startDate); }
-  catch (error) { errors.startDate = (error as Error).message; }
-  if (!draft.current) {
-    try { end = parseDateInput(draft.endDate); }
-    catch (error) { errors.endDate = (error as Error).message; }
-    if (start && end && end <= start) errors.endDate = 'To must be later than From.';
-  }
-  return errors;
-}
 export function applyWork(resume: Resume, drafts: WorkDraft[]): Resume {
   const result = structuredClone(resume);
   result.work = drafts.map((draft, index) => {
-    const errors = workDateErrors(draft);
+    const errors = dateRangeErrors(draft);
     if (errors.startDate || errors.endDate) throw new Error(`Position ${index + 1}: ${errors.startDate ?? errors.endDate}`);
     const entry: WorkEntry = { ...structuredClone(draft.source), id: draft.id, current: draft.current };
     for (const key of workTextFields) {
@@ -87,8 +65,8 @@ export function applyWork(resume: Resume, drafts: WorkDraft[]): Resume {
     else delete entry.endDate;
     // Existing array items can themselves contain newlines. Preserve unchanged
     // arrays; only parse user-edited highlights text into new bullet points.
-    const highlights = draft.highlightsText === formatHighlights(draft.source.highlights)
-      ? structuredClone(draft.source.highlights ?? []) : parseHighlights(draft.highlightsText);
+    const highlights = draft.highlightsText === formatBulletList(draft.source.highlights)
+      ? structuredClone(draft.source.highlights ?? []) : parseBulletList(draft.highlightsText);
     if (highlights.length) entry.highlights = highlights;
     else delete entry.highlights;
     return entry;

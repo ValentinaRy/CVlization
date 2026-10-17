@@ -1,7 +1,8 @@
+import { formatBulletList, parseBulletList } from './bullet-list';
 import { describe, expect, it, vi } from 'vitest';
-import { formatDateForInput, normalizeDate, parseDateInput } from './dates';
+import { dateRangeErrors, formatDateForInput, normalizeDate, parseDateInput } from './dates';
 import { newResume, parseResume } from './model';
-import { applyWork, formatHighlights, newWorkDraft, parseHighlights, workDateErrors, workToDraft } from './work';
+import { applyWork, newWorkDraft, workToDraft } from './work';
 import { ResumeSession } from './session';
 import type { SavedResume } from './repository';
 
@@ -20,10 +21,10 @@ describe('calendar dates', () => {
 describe('work highlights', () => {
   it('splits lines, trims whitespace, strips only the supported leading markers, and discards empty bullets', () => {
     const input = '\n - Built tools\r\n * Improved tests\n+ Led delivery\n > Mentored peers\n< Reviewed code\n# Wrote docs\n • Measured outcomes\n- \n\t\nPlain text\rLast line';
-    expect(parseHighlights(input)).toEqual(['Built tools', 'Improved tests', 'Led delivery', 'Mentored peers', 'Reviewed code', 'Wrote docs', 'Measured outcomes', 'Plain text', 'Last line']);
+    expect(parseBulletList(input)).toEqual(['Built tools', 'Improved tests', 'Led delivery', 'Mentored peers', 'Reviewed code', 'Wrote docs', 'Measured outcomes', 'Plain text', 'Last line']);
   });
   it('preserves internal punctuation, unsupported markers, ordering and duplicate lines', () => {
-    expect(parseHighlights('C++ and C#\n+49 phone\n-5 degrees\n*word\n#hashtag\n1. First\n– Another\n- Same\n- Same')).toEqual(['C++ and C#', '+49 phone', '-5 degrees', '*word', '#hashtag', '1. First', '– Another', 'Same', 'Same']);
+    expect(parseBulletList('C++ and C#\n+49 phone\n-5 degrees\n*word\n#hashtag\n1. First\n– Another\n- Same\n- Same')).toEqual(['C++ and C#', '+49 phone', '-5 degrees', '*word', '#hashtag', '1. First', '– Another', 'Same', 'Same']);
   });
 });
 
@@ -34,7 +35,7 @@ describe('work model', () => {
     const draft = newWorkDraft();
     const entry = applyWork(newResume(), [draft]).work![0]!;
     expect(entry).toEqual({ id: draft.id, current: false });
-    expect(workDateErrors(draft)).toEqual({});
+    expect(dateRangeErrors(draft)).toEqual({});
   });
   it('round-trips entries and stable IDs while preserving basics, future sections, and unknown work data', () => {
     const original = parseResume(JSON.stringify({ schemaVersion: 1, id: 'resume', basics: { firstName: 'Alex' }, education: [{ institution: 'Example' }], work: [{ name: 'Example Co', summary: '  Lines\n\n- not highlights  ', custom: { keep: true }, highlights: ['First\ncontinued', '- literal original'] }] }));
@@ -60,9 +61,9 @@ describe('work model', () => {
     const saved = applyWork(newResume(), [a, b]);
     expect(saved.work!.every(entry => entry.current && !Object.hasOwn(entry, 'endDate'))).toBe(true);
     expect(a.endDate).toBe('bad date');
-    expect(workDateErrors(a)).toEqual({});
+    expect(dateRangeErrors(a)).toEqual({});
     a.current = false;
-    expect(workDateErrors(a).endDate).toBeDefined();
+    expect(dateRangeErrors(a).endDate).toBeDefined();
   });
   it('does not infer current from missing endDate and explicitly removes stale endDate for current work', () => {
     const drafts = workToDraft([{ name: 'Unknown end' }, { name: 'Ongoing', current: true, endDate: '2025-01-01' }]);
@@ -74,16 +75,16 @@ describe('work model', () => {
   it('requires To strictly after From only when both dates are supplied and position is not current', () => {
     const draft = newWorkDraft();
     Object.assign(draft, { startDate: '06/2030', endDate: '01/06/2030' });
-    expect(workDateErrors(draft).endDate).toBe('To must be later than From.');
+    expect(dateRangeErrors(draft).endDate).toBe('To must be later than From.');
     draft.endDate = '05/2030';
     expect(() => applyWork(newResume(), [draft])).toThrow('later');
     draft.endDate = '02/06/2030';
-    expect(workDateErrors(draft)).toEqual({});
+    expect(dateRangeErrors(draft)).toEqual({});
     draft.startDate = '';
-    expect(workDateErrors(draft)).toEqual({});
+    expect(dateRangeErrors(draft)).toEqual({});
     draft.endDate = '';
     draft.startDate = '01/2031';
-    expect(workDateErrors(draft)).toEqual({});
+    expect(dateRangeErrors(draft)).toEqual({});
   });
   it('leaves summary alone when highlights are absent and parses only edited highlights', () => {
     const draft = newWorkDraft();
@@ -110,7 +111,7 @@ describe('work model', () => {
     const parsed = parseResume(JSON.stringify({ schemaVersion: 1, id: 'resume', basics: {}, work: [{ startDate: '2026-02-30' }] }));
     const draft = workToDraft(parsed.work)[0]!;
     expect(draft.startDate).toBe('2026-02-30');
-    expect(workDateErrors(draft).startDate).toBeDefined();
+    expect(dateRangeErrors(draft).startDate).toBeDefined();
   });
 });
 
@@ -161,9 +162,9 @@ describe('date presentation', () => {
   it('compares calendar dates rather than displayed strings', () => {
     const draft = newWorkDraft();
     Object.assign(draft, { startDate: '31/12/2026', endDate: '01/01/2027' });
-    expect(workDateErrors(draft)).toEqual({});
+    expect(dateRangeErrors(draft)).toEqual({});
     draft.endDate = '01/12/2026';
-    expect(workDateErrors(draft).endDate).toBe('To must be later than From.');
+    expect(dateRangeErrors(draft).endDate).toBe('To must be later than From.');
   });
 });
 
@@ -203,9 +204,9 @@ describe('formatted drafts and unsaved changes', () => {
   it('adds one display marker per array item and preserves multiline items and literal markers when unchanged', () => {
     const highlights = ['First\ncontinued', '- literal original', '+49 phone'];
     const drafts = workToDraft([{ highlights }]);
-    expect(formatHighlights()).toBe('');
+    expect(formatBulletList()).toBe('');
     expect(drafts[0]!.highlightsText).toBe('- First\ncontinued\n- - literal original\n- +49 phone');
     expect(applyWork(newResume(), drafts).work![0]!.highlights).toEqual(highlights);
-    expect(parseHighlights(formatHighlights(['- literal original', '+49 phone']))).toEqual(['- literal original', '+49 phone']);
+    expect(parseBulletList(formatBulletList(['- literal original', '+49 phone']))).toEqual(['- literal original', '+49 phone']);
   });
 });

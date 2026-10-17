@@ -1,3 +1,4 @@
+import { educationEditor } from './education-editor';
 import { workEditor } from './work-editor';
 import '../shared/styles.css';
 import { inspectWorkspace, reconnectWorkspace, workspaceMessage } from '../workspace/access';
@@ -22,6 +23,7 @@ const save = document.querySelector<HTMLButtonElement>('#save-resume')!;
 const warnings = document.querySelector<HTMLElement>('#draft-warnings')!;
 const profileContainer = document.querySelector<HTMLElement>('#profile-inputs')!;
 const addProfile = document.querySelector<HTMLButtonElement>('#add-profile')!;
+let educationForm: ReturnType<typeof educationEditor> | undefined;
 let workForm: ReturnType<typeof workEditor> | undefined;
 let folder: FileSystemDirectoryHandle | undefined;
 let session: ResumeSession | undefined;
@@ -138,6 +140,7 @@ function renderForm() {
   filename.value = session!.filename;
   renderProfiles();
   workForm = workEditor(document.querySelector<HTMLElement>('#work-inputs')!, document.querySelector<HTMLButtonElement>('#add-work')!, session!.work, renderState);
+  educationForm = educationEditor(document.querySelector<HTMLElement>('#education-inputs')!, document.querySelector<HTMLButtonElement>('#add-education')!, session!.education, renderState);
   form.hidden = false;
   renderState();
 }
@@ -196,7 +199,7 @@ form.addEventListener('submit', async event => {
   event.preventDefault();
   if (!folder || !session || busy) return;
   if (filenameError(session.filename)) { renderState(); filename.focus(); return; }
-  if (workForm?.focusFirstError()) return;
+  if (workForm?.focusFirstError() || educationForm?.focusFirstError()) return;
   busy = true;
   errorBox.hidden = true;
   renderState();

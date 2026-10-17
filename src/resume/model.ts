@@ -1,3 +1,5 @@
+import { validateEducationEntries } from './education';
+import type { EducationEntry } from './education';
 import { validateWorkEntries } from './work';
 import type { WorkEntry } from './work';
 export const basicFields = ['firstName', 'lastName', 'label', 'email', 'phoneCountryCode', 'phoneNumber', 'url', 'summary'] as const;
@@ -9,7 +11,7 @@ export type Basics = JsonObject & Partial<Record<typeof basicFields[number] | 'n
   location?: JsonObject & Partial<Record<typeof locationFields[number] | 'countryCode', string>>;
   profiles?: Profile[];
 };
-export type Resume = JsonObject & { schemaVersion: 1; id: string; basics: Basics; work?: WorkEntry[] };
+export type Resume = JsonObject & { schemaVersion: 1; id: string; basics: Basics; work?: WorkEntry[]; education?: EducationEntry[] };
 export type BasicsDraft = Record<typeof basicFields[number], string> & {
   location: Record<typeof locationFields[number], string>;
   profiles: Profile[];
@@ -57,6 +59,7 @@ export function parseResume(text: string): Resume {
     }
   }
   if (Array.isArray(value.work)) validateWorkEntries(value.work);
+  if (Array.isArray(value.education)) validateEducationEntries(value.education);
   return value as Resume;
 }
 

@@ -1,5 +1,5 @@
 import type { Resume } from './model';
-import { normalizeDate } from './dates';
+import { formatDateForInput, parseDateInput } from './dates';
 
 export const workTextFields = ['name', 'position', 'location', 'description', 'url', 'summary'] as const;
 export type WorkEntry = Record<string, unknown> & Partial<Record<typeof workTextFields[number] | 'id' | 'startDate' | 'endDate', string>> & {
@@ -36,14 +36,18 @@ export function workToDraft(entries: WorkEntry[] = []): WorkDraft[] {
   return entries.map(entry => ({
     ...Object.fromEntries(workTextFields.map(key => [key, entry[key] ?? ''])),
     id: entry.id ?? crypto.randomUUID(),
-    startDate: entry.startDate ?? '', endDate: entry.endDate ?? '',
+    startDate: formatDateForInput(entry.startDate), endDate: formatDateForInput(entry.endDate),
     // Missing dates can also mean an incomplete draft. Never infer current status.
     current: entry.current ?? false,
-    highlightsText: (entry.highlights ?? []).join('\n'),
+    highlightsText: formatHighlights(entry.highlights),
     source: structuredClone(entry),
   } as WorkDraft));
 }
 export function newWorkDraft(): WorkDraft { return workToDraft([{}])[0]!; }
+
+export function formatHighlights(highlights: string[] = []): string {
+  return highlights.map(item => `- ${item}`).join('\n');
+}
 
 export function parseHighlights(text: string): string[] {
   return text.split(/\r\n|\n|\r/)
@@ -54,10 +58,10 @@ export function workDateErrors(draft: WorkDraft): WorkDateErrors {
   const errors: WorkDateErrors = {};
   let start: string | undefined;
   let end: string | undefined;
-  try { start = normalizeDate(draft.startDate); }
+  try { start = parseDateInput(draft.startDate); }
   catch (error) { errors.startDate = (error as Error).message; }
   if (!draft.current) {
-    try { end = normalizeDate(draft.endDate); }
+    try { end = parseDateInput(draft.endDate); }
     catch (error) { errors.endDate = (error as Error).message; }
     if (start && end && end <= start) errors.endDate = 'To must be later than From.';
   }
@@ -75,15 +79,15 @@ export function applyWork(resume: Resume, drafts: WorkDraft[]): Resume {
       if (value) entry[key] = value;
       else delete entry[key];
     }
-    const start = normalizeDate(draft.startDate);
-    const end = draft.current ? undefined : normalizeDate(draft.endDate);
+    const start = parseDateInput(draft.startDate);
+    const end = draft.current ? undefined : parseDateInput(draft.endDate);
     if (start) entry.startDate = start;
     else delete entry.startDate;
     if (end) entry.endDate = end;
     else delete entry.endDate;
     // Existing array items can themselves contain newlines. Preserve unchanged
     // arrays; only parse user-edited highlights text into new bullet points.
-    const highlights = draft.highlightsText === (draft.source.highlights ?? []).join('\n')
+    const highlights = draft.highlightsText === formatHighlights(draft.source.highlights)
       ? structuredClone(draft.source.highlights ?? []) : parseHighlights(draft.highlightsText);
     if (highlights.length) entry.highlights = highlights;
     else delete entry.highlights;

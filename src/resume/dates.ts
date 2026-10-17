@@ -14,3 +14,25 @@ export function normalizeDate(input: string): string | undefined {
   }
   return `${match[1]}-${match[2]}-${match[3] ?? '01'}`;
 }
+
+/** Human-facing day/month/year input; storage always uses ISO calendar dates. */
+export function parseDateInput(input: string): string | undefined {
+  const value = input.trim();
+  if (!value) return undefined;
+  const full = /^(\d{2})\/(\d{2})\/(\d{4})$/.exec(value);
+  const month = /^(\d{2})\/(\d{4})$/.exec(value);
+  if (full) return normalizeDate(`${full[3]}-${full[2]}-${full[1]}`);
+  if (month) return normalizeDate(`${month[2]}-${month[1]}`);
+  throw new Error('Use DD/MM/YYYY (or MM/YYYY for day 01).');
+}
+
+export function formatDateForInput(stored: string = ''): string {
+  try {
+    const date = normalizeDate(stored);
+    if (!date) return '';
+    return `${date.slice(8, 10)}/${date.slice(5, 7)}/${date.slice(0, 4)}`;
+  } catch {
+    // Keep malformed file contents visible so the user can correct them.
+    return stored;
+  }
+}

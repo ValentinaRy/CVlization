@@ -133,6 +133,7 @@ footer p { margin-bottom: 6px; }
 .editor .checkbox-label { display: flex; align-items: center; gap: 10px; margin: 0; cursor: pointer; }
 .editor input[type="checkbox"] { width: 20px; height: 20px; accent-color: var(--color-accent); }
 .editor input:disabled { background: var(--color-lilac); color: var(--color-muted); cursor: not-allowed; }
-.date-controls { display: flex; gap: 8px; margin-top: 8px; position: relative; }
-.date-controls button { padding: 6px 12px; font-size: .85rem; }
+.date-input { position: relative; }
+.date-input > input[type="text"] { padding-right: 36px; }
+.date-icon { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); pointer-events: none; color: var(--color-muted); }
 .editor .native-picker { position: absolute; bottom: 0; left: 0; width: 1px; height: 1px; padding: 0; border: 0; opacity: 0; pointer-events: none; }

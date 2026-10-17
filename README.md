@@ -69,7 +69,7 @@ Folder access may require enabling **File System Access API** at `brave://flags/
 
 The folder handle is remembered in this browser. After reopening or restarting, check the folder name and use **Reconnect** if necessary. Clearing extension storage may require selecting it again. Existing files changed on disk since opening are not silently overwritten: keep the draft under a different name or reopen the file.
 
-The editor currently handles basic details and work experience. Dates accept YYYY-MM-DD or YYYY-MM, with native date/month pickers; month-only input is saved with day 01. Current positions omit the end date, and several positions can be current. External JSON Resume import and recovery of unsaved drafts after a crash are planned; navigation warnings are not a backup. The old fictional experiment files are not CVlization resumes and cannot be opened in the new editor.
+The editor currently handles basic details and work experience. Dates display DD/MM/YYYY and accept manual input or a calendar opened by clicking the field (Alt+Down with the keyboard). MM/YYYY input uses day 01; JSON stores YYYY-MM-DD. Saved highlights reopen with a leading `- ` on each item. Current positions omit the end date, and several positions can be current. External JSON Resume import and recovery of unsaved drafts after a crash are planned; navigation warnings are not a backup. The old fictional experiment files are not CVlization resumes and cannot be opened in the new editor.
 
 ## Roadmap
 

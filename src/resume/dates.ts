@@ -48,7 +48,7 @@ export function dateRangeErrors(draft: { startDate: string; endDate: string; cur
   if (!draft.current) {
     try { end = parseDateInput(draft.endDate); }
     catch (error) { errors.endDate = (error as Error).message; }
-    if (start && end && end <= start) errors.endDate = 'To must be later than From.';
+    if (start && end && end < start) errors.endDate = 'To must be on or after From.';
   }
   return errors;
 }

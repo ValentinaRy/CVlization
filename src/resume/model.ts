@@ -1,10 +1,10 @@
-export const basicFields = ['firstName', 'lastName', 'label', 'image', 'email', 'phoneCountryCode', 'phoneNumber', 'url', 'summary'] as const;
-export const locationFields = ['address', 'postalCode', 'city', 'countryCode', 'region'] as const;
+export const basicFields = ['firstName', 'lastName', 'label', 'email', 'phoneCountryCode', 'phoneNumber', 'url', 'summary'] as const;
+export const locationFields = ['address', 'postalCode', 'city', 'country', 'region'] as const;
 export const profileFields = ['network', 'username', 'url'] as const;
 type JsonObject = Record<string, unknown>;
 export type Profile = JsonObject & { network?: string; username?: string; url?: string };
-export type Basics = JsonObject & Partial<Record<typeof basicFields[number] | 'name' | 'phone', string>> & {
-  location?: JsonObject & Partial<Record<typeof locationFields[number], string>>;
+export type Basics = JsonObject & Partial<Record<typeof basicFields[number] | 'name' | 'phone' | 'image', string>> & {
+  location?: JsonObject & Partial<Record<typeof locationFields[number] | 'countryCode', string>>;
   profiles?: Profile[];
 };
 export type Resume = JsonObject & { schemaVersion: 1; id: string; basics: Basics };
@@ -36,10 +36,10 @@ export function parseResume(text: string): Resume {
   if (typeof value.id !== 'string' || !value.id.trim() || !object(value.basics)) {
     throw new Error('This resume needs an id and a basics object. The file has not been changed.');
   }
-  checkStrings(value.basics, [...basicFields, 'name', 'phone'], 'basics');
+  checkStrings(value.basics, [...basicFields, 'name', 'phone', 'image'], 'basics');
   if (value.basics.location !== undefined) {
     if (!object(value.basics.location)) throw new Error('basics.location must be an object.');
-    checkStrings(value.basics.location, locationFields, 'basics.location');
+    checkStrings(value.basics.location, [...locationFields, 'countryCode'], 'basics.location');
   }
   if (value.basics.profiles !== undefined) {
     if (!Array.isArray(value.basics.profiles)) throw new Error('basics.profiles must be a list.');
@@ -90,6 +90,9 @@ export function applyBasics(resume: Resume, draft: BasicsDraft): Resume {
   if (phone || resume.basics.phoneCountryCode !== undefined || resume.basics.phoneNumber !== undefined) setText(basics, 'phone', phone);
   const location: JsonObject = { ...basics.location };
   for (const key of locationFields) setText(location, key, draft.location[key]);
+  // Keep older codes when the country is untouched, but never retain a stale code
+  // after a free-text country change. Country selection/derivation is a later task.
+  if (draft.location.country.trim() !== (resume.basics.location?.country ?? '').trim()) delete location.countryCode;
   if (Object.keys(location).length) basics.location = location;
   else delete basics.location;
   const profiles = draft.profiles.map(profile => {
@@ -108,7 +111,7 @@ export function draftWarnings(draft: BasicsDraft): string[] {
     warnings.push('Check the email address. You can still save this draft.');
   }
   for (const [label, value] of [
-    ['Website', draft.url], ['Image URL', draft.image],
+    ['Website', draft.url],
     ...draft.profiles.map((p, i) => [`Profile ${i + 1} URL`, p.url ?? '']),
   ]) {
     if (!value?.trim()) continue;

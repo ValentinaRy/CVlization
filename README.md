@@ -24,7 +24,7 @@ The core workflow is intended to run without an account or our own backend. Opti
 - A Manifest V3 extension shell with a toolbar popup and a full-tab dashboard.
 - A workspace connection panel that remembers the selected folder in this browser, checks access on reopening, and offers Reconnect when permission is needed.
 - A dashboard listing workspace JSON files and a separate basic resume editor.
-- Optional basic details, address, and multiple social profiles, with combined name and phone values.
+- Optional basic details, country name, address, and multiple social profiles; combined name and phone values are generated on save.
 - Explicit Save to a named JSON file, filename validation, unsaved-change indication, and detection of files changed since opening.
 - TypeScript checking and a Vite build for local installation.
 - A build watcher for development and a package sanity check.
@@ -64,7 +64,7 @@ Use DevTools to inspect the dashboard, or right-click the popup and choose **Ins
 
 ### Brave and workspace access
 
-Folder access may require enabling **File System Access API** at `brave://flags/#file-system-access-api`, followed by a browser restart. Choose a dedicated workspace folder, then use **Create resume** or open a saved CVlization JSON file. Enter a filename without `.json`; all resume content is optional. **Save** writes the file, and changing an existing filename saves a separate copy.
+Folder access may require enabling **File System Access API** at `brave://flags/#file-system-access-api`, followed by a browser restart. Choose a dedicated workspace folder, then use **Create resume** or open a saved CVlization JSON file. Enter a filename without `.json`; all resume content is optional. **Save** writes the file and returns to the dashboard with a confirmation notification. Edge whitespace in filenames is trimmed; commas and dots are allowed. Changing an existing filename currently saves a separate copy; a dedicated rename workflow is tracked in [#25](https://github.com/ValentinaRy/CVlization/issues/25).
 
 The folder handle is remembered in this browser. After reopening or restarting, check the folder name and use **Reconnect** if necessary. Clearing extension storage may require selecting it again. Existing files changed on disk since opening are not silently overwritten: keep the draft under a different name or reopen the file.
 

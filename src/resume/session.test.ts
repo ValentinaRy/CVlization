@@ -53,6 +53,18 @@ describe('explicit save lifecycle', () => {
     expect(original.resume.id).toBe('original');
     expect(session.isCopy).toBe(false);
   });
+  it('does not turn whitespace-only filename changes into a new copy', async () => {
+    const original = saved('resume', newResume('original'));
+    const session = new ResumeSession('resume', original);
+    session.filename = '  resume  ';
+    expect(session.isCopy).toBe(false);
+    await session.save(async (base, resume) => {
+      expect(base).toBe('resume');
+      expect(resume.id).toBe('original');
+      return saved(base, resume);
+    });
+    expect(session.original!.filename).toBe('resume.json');
+  });
   it('never marks edits made during a pending write as already saved', async () => {
     const session = new ResumeSession('resume');
     session.draft.firstName = 'Before';

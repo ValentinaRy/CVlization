@@ -54,6 +54,13 @@ describe('local resume persistence', () => {
     put('resume.json', JSON.stringify({ schemaVersion: 1, id: 'changed', basics: { firstName: 'Taylor' } }));
     expect((await readResume(folder, result.filename)).resume.id).toBe('changed');
   });
+  it('trims the filename before writing while preserving punctuation', async () => {
+    const m = memoryFolder();
+    const saved = await writeResume(m.folder, '  Resume, Java.  ', newResume());
+    expect(saved.filename).toBe('Resume, Java..json');
+    expect([...m.files.keys()]).toEqual(['Resume, Java..json']);
+    await expect(writeResume(m.folder, ' Resume, Java. ', newResume())).rejects.toThrow('already exists');
+  });
   it('refuses collisions with files or directories, including case aliases', async () => {
     const { folder, put, files, directories } = memoryFolder();
     put('Resume.json', 'unrelated file');

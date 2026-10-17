@@ -10,11 +10,11 @@ describe('resume data', () => {
     const resume = newResume();
     const draft = toDraft(resume);
     Object.assign(draft, { firstName: ' Alex ', lastName: 'Taylor', phoneCountryCode: '+49', phoneNumber: '00123 4567', email: 'unfinished' });
-    draft.location = { address: 'First line\nSecond line', postalCode: '00123', city: 'Berlin', countryCode: 'DE', region: '' };
+    draft.location = { address: 'First line\nSecond line', postalCode: '00123', city: 'Berlin', country: 'Germany', region: '' };
     draft.profiles = [{ network: 'GitHub', username: 'alex' }, { url: 'https://example.com' }, {}];
     const saved = parseResume(JSON.stringify(applyBasics(resume, draft)));
     expect(saved.basics).toMatchObject({ firstName: 'Alex', lastName: 'Taylor', name: 'Alex Taylor', phoneCountryCode: '+49', phoneNumber: '00123 4567', phone: '+4900123 4567', email: 'unfinished' });
-    expect(saved.basics.location).toEqual({ address: 'First line\nSecond line', postalCode: '00123', city: 'Berlin', countryCode: 'DE' });
+    expect(saved.basics.location).toEqual({ address: 'First line\nSecond line', postalCode: '00123', city: 'Berlin', country: 'Germany' });
     expect(saved.basics.profiles).toEqual([{ network: 'GitHub', username: 'alex' }, { url: 'https://example.com' }]);
     expect(toDraft(saved).phoneNumber).toBe('00123 4567');
     expect(draftWarnings(draft)).toContain('Check the email address. You can still save this draft.');
@@ -60,6 +60,25 @@ describe('resume data', () => {
     [JSON.stringify({ schemaVersion: 1, id: 'x', basics: {}, work: 'not a list' }), 'work'],
   ])('rejects damaged or unsupported data: %s', (text, message) => {
     expect(() => parseResume(text)).toThrow(message);
+  });
+  it('preserves hidden image/country-code fields until a country change invalidates the code', () => {
+    const resume = parseResume(JSON.stringify({ schemaVersion: 1, id: 'x', basics: {
+      image: 'https://example.com/photo.jpg', location: { country: 'Germany', countryCode: 'DE', district: 'Mitte' },
+    } }));
+    const draft = toDraft(resume);
+    expect(draft).not.toHaveProperty('image');
+    expect(draft.location).not.toHaveProperty('countryCode');
+    expect(applyBasics(resume, draft)).toEqual(resume);
+    draft.location.country = 'France';
+    const updated = applyBasics(resume, draft);
+    expect(updated.basics.location).toEqual({ country: 'France', district: 'Mitte' });
+    expect(updated.basics.image).toBe(resume.basics.image);
+  });
+  it('does not manufacture country codes or placeholder values in an empty draft', () => {
+    const resume = newResume();
+    const draft = toDraft(resume);
+    draft.location.country = 'Somewhere';
+    expect(applyBasics(resume, draft).basics).toEqual({ location: { country: 'Somewhere' } });
   });
   it('reports URL and phone concerns without blocking draft serialization', () => {
     const resume = newResume();

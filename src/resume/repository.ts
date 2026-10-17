@@ -26,7 +26,7 @@ export async function writeResume(
 ): Promise<SavedResume> {
   const entries = await listEntries(folder);
   assertAvailable(base, entries.map(entry => entry.name), original?.filename);
-  const filename = `${base}.json`;
+  const filename = `${base.trim()}.json`;
   const updating = original?.filename === filename;
   let handle: FileSystemFileHandle;
   if (updating) {

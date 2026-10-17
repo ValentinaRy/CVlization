@@ -21,7 +21,7 @@ export class ResumeSession {
   }
   private snapshot() { return JSON.stringify([this.filename, this.draft]); }
   get dirty() { return this.snapshot() !== this.baseline; }
-  get isCopy() { return !!this.original && `${this.filename}.json` !== this.original.filename; }
+  get isCopy() { return !!this.original && `${this.filename.trim()}.json` !== this.original.filename; }
 
   async save(persist: Persist): Promise<void> {
     if (this.saving) throw new Error('A save is already in progress.');
@@ -30,7 +30,7 @@ export class ResumeSession {
     try {
       const resume = applyBasics(this.resume, this.draft);
       if (this.isCopy) resume.id = crypto.randomUUID();
-      const saved = await persist(this.filename, resume, this.original);
+      const saved = await persist(this.filename.trim(), resume, this.original);
       this.original = saved;
       this.resume = saved.resume;
       // The UI locks during save; retaining the captured snapshot also protects later edits.

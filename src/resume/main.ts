@@ -2,7 +2,7 @@ import '../shared/styles.css';
 import { inspectWorkspace, reconnectWorkspace, workspaceMessage } from '../workspace/access';
 import { loadWorkspace } from '../workspace/handle-store';
 import { assertAvailable, filenameError, suggestedFilename } from './filenames';
-import { combinedName, combinedPhone, draftWarnings, locationFields, profileFields } from './model';
+import { draftWarnings, locationFields, profileFields } from './model';
 import type { BasicsDraft } from './model';
 import { listEntries, readResume, writeResume } from './repository';
 import { ResumeSession } from './session';
@@ -21,8 +21,6 @@ const save = document.querySelector<HTMLButtonElement>('#save-resume')!;
 const warnings = document.querySelector<HTMLElement>('#draft-warnings')!;
 const profileContainer = document.querySelector<HTMLElement>('#profile-inputs')!;
 const addProfile = document.querySelector<HTMLButtonElement>('#add-profile')!;
-const fullName = document.createElement('input');
-const fullPhone = document.createElement('input');
 let folder: FileSystemDirectoryHandle | undefined;
 let session: ResumeSession | undefined;
 let entries: string[] = [];
@@ -59,9 +57,6 @@ function renderState() {
   filename.setAttribute('aria-invalid', String(!!problem));
   copyHint.hidden = !session.isCopy;
   status.textContent = session.saving ? 'Saving…' : busy ? 'Checking…' : saveFailed ? 'Save failed · draft kept' : session.dirty ? 'Unsaved changes' : session.original ? 'Saved' : 'Not saved yet';
-  const original = session.original?.resume.basics;
-  fullName.value = combinedName(session.draft) || (original?.firstName === undefined && original?.lastName === undefined ? original?.name ?? '' : '');
-  fullPhone.value = combinedPhone(session.draft) || (original?.phoneCountryCode === undefined && original?.phoneNumber === undefined ? original?.phone ?? '' : '');
   warnings.replaceChildren();
   for (const warning of draftWarnings(session.draft)) {
     const item = document.createElement('li');
@@ -85,16 +80,6 @@ function inputField(container: HTMLElement, id: string, labelText: string, value
   if (options.placeholder) input.placeholder = options.placeholder;
   if (input instanceof HTMLTextAreaElement) input.rows = 5;
   input.addEventListener('input', () => { onInput(input.value); renderState(); });
-  wrapper.append(label, input);
-  container.append(wrapper);
-}
-function derivedField(container: HTMLElement, input: HTMLInputElement, id: string, title: string) {
-  const wrapper = document.createElement('div');
-  const label = document.createElement('label');
-  label.htmlFor = id;
-  label.textContent = title;
-  input.id = id;
-  input.readOnly = true;
   wrapper.append(label, input);
   container.append(wrapper);
 }
@@ -134,20 +119,17 @@ function renderForm() {
   const fields: { key: Exclude<keyof BasicsDraft, 'location' | 'profiles'>; label: string; type?: string; autocomplete?: string; multiline?: boolean; placeholder?: string }[] = [
     { key: 'firstName', label: 'First name', autocomplete: 'given-name' },
     { key: 'lastName', label: 'Last name', autocomplete: 'family-name' },
-    { key: 'label', label: 'Professional title', placeholder: 'Java Developer', autocomplete: 'organization-title' },
+    { key: 'label', label: 'Professional title', placeholder: 'e.g. Java Developer', autocomplete: 'organization-title' },
     { key: 'email', label: 'Email', type: 'email', autocomplete: 'email' },
-    { key: 'phoneCountryCode', label: 'Phone country code', type: 'tel', placeholder: '+49', autocomplete: 'tel-country-code' },
+    { key: 'phoneCountryCode', label: 'Phone country code', type: 'tel', placeholder: 'e.g. +49', autocomplete: 'tel-country-code' },
     { key: 'phoneNumber', label: 'Phone number (without country code)', type: 'tel', autocomplete: 'tel-national' },
     { key: 'url', label: 'Website', type: 'url', autocomplete: 'url' },
-    { key: 'image', label: 'Image URL', type: 'url', placeholder: 'https://example.com/photo.jpg' },
     { key: 'summary', label: 'About you', multiline: true },
   ];
   for (const field of fields) {
     inputField(basics, field.key, field.label, session!.draft[field.key], value => { session!.draft[field.key] = value; }, field);
-    if (field.key === 'lastName') derivedField(basics, fullName, 'full-name', 'Full name · combined automatically');
-    if (field.key === 'phoneNumber') derivedField(basics, fullPhone, 'full-phone', 'Phone · combined automatically');
   }
-  const labels = { address: 'Street address', postalCode: 'Postal code', city: 'City', countryCode: 'Country code (e.g. DE)', region: 'Region / state' };
+  const labels = { address: 'Street address', postalCode: 'Postal code', city: 'City', country: 'Country', region: 'Region / state' };
   for (const key of locationFields) {
     inputField(location, key, labels[key], session!.draft.location[key], value => { session!.draft.location[key] = value; }, { multiline: key === 'address' });
   }
@@ -222,11 +204,10 @@ form.addEventListener('submit', async event => {
       await session!.save((base, resume, original) => writeResume(folder!, base, resume, original));
     });
     saveFailed = false;
-    const url = new URL(window.location.href);
-    url.searchParams.set('file', session.original!.filename);
-    window.history.replaceState(null, '', url);
-    // A failed listing after a successful commit must not be reported as a failed save.
-    try { entries = (await listEntries(folder)).map(entry => entry.name); } catch { /* Rechecked on the next write. */ }
+    const destination = new URL('dashboard.html', window.location.href);
+    destination.searchParams.set('saved', session.original!.filename);
+    leaving = true;
+    window.location.assign(destination.href);
   } catch (error) {
     saveFailed = true;
     showError(error);

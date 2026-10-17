@@ -14,54 +14,42 @@
       <section class="hero" aria-labelledby="intro">
         <p class="eyebrow">Less stress. More possibility.</p>
         <h1 id="intro">Build your<br />next chapter.</h1>
-        <p class="lead">One profile. Your documents. A clearer view of your job search.</p>
+        <p class="lead">Your resumes. Your documents. A clearer view of your job search.</p>
       </section>
       <section class="stage" aria-labelledby="stage-title">
         <span class="stage-number" aria-hidden="true">02</span>
         <div>
           <p class="eyebrow">🚩 Current stage</p>
           <h2 id="stage-title">Local workspace</h2>
-          <p>Our first small step: write a fictional profile to a folder and read it back.</p>
+          <p>Create a resume, save it in your folder, and pick up where you left off.</p>
         </div>
       </section>
-      <section class="workspace-experiment" aria-labelledby="experiment-title">
-        <p class="eyebrow">A small experiment</p>
-        <h2 id="experiment-title">A little home for your data</h2>
-        <p>Choose a dedicated test folder, write the fictional user below, then read the file back and compare the values.</p>
+      <section class="card" aria-labelledby="workspace-title">
+        <p class="eyebrow">A little home for your data</p>
+        <h2 id="workspace-title">Your workspace</h2>
+        <p>Choose a folder for your resumes. Your files stay on your computer.</p>
         <div class="workspace-summary">
-          <div><p class="eyebrow">Your workspace</p><p id="workspace-name">No folder selected</p></div>
+          <div><p class="eyebrow">Selected folder</p><p id="workspace-name">No folder selected</p></div>
           <span id="workspace-state" class="badge" role="status">Checking access…</span>
         </div>
-        <div class="experiment-actions" aria-label="Workspace connection">
-          <button id="choose-test-folder" type="button" disabled>Choose folder</button>
+        <div class="actions" aria-label="Workspace connection">
+          <button id="choose-folder" type="button" disabled>Choose folder</button>
           <button id="reconnect-workspace" type="button" disabled hidden>Reconnect</button>
         </div>
         <p id="workspace-status" class="note" role="status">Looking for your saved folder…</p>
         <p id="workspace-warning" class="note" role="status"></p>
-        <div class="experiment-actions" aria-label="File experiment actions">
-          <button id="write-test-file" type="button" disabled>Write test file</button>
-          <button id="read-test-file" type="button" disabled>Read test file</button>
-        </div>
-        <p id="test-location" class="note">No test file written in this tab.</p>
-        <p id="test-status" class="note" role="status" aria-live="polite">Start by choosing a test folder.</p>
-        <div class="json-comparison">
-          <div>
-            <h3 id="source-title">Source · fictional user</h3>
-            <pre id="test-source" aria-labelledby="source-title"></pre>
-          </div>
-          <div>
-            <h3 id="result-title">Read from file</h3>
-            <pre id="test-result" aria-labelledby="result-title">No file read yet.</pre>
-          </div>
-        </div>
-        <p class="note">Your folder is remembered in this browser. Reopening may require Reconnect. Each write creates a new test file; Read uses the latest file written in this tab.</p>
+      </section>
+      <section class="card" aria-labelledby="resumes-title">
+        <div class="section-heading"><h2 id="resumes-title">Your resumes</h2><button id="create-resume" type="button" disabled>Create resume</button></div>
+        <p id="resumes-status" class="note" role="status">Connect a folder to get started.</p>
+        <ul id="resume-list" class="file-list"></ul>
       </section>
       <section class="feature-grid" aria-label="Planned features">
         <article><p class="eyebrow">Planned</p><h2>Your profile</h2><p>Keep experience, education, and documents together in a folder you choose.</p></article>
         <article><p class="eyebrow">Planned</p><h2>Your applications</h2><p>Remember where you applied, what you sent, and what happened next.</p></article>
         <article><p class="eyebrow">Planned</p><h2>Your words</h2><p>Turn reusable cover-letter templates into text and PDF documents.</p></article>
       </section>
-      <footer><p id="build-info">CVlization</p><p>Test files stay in the folder you choose. This preview does not read websites or send data.</p></footer>
+      <footer><p id="build-info">CVlization</p><p>Your resumes stay in the folder you choose. This preview does not read websites or send data.</p></footer>
     </main>
     <script type="module" src="/src/dashboard/main.ts"></script>
   </body>

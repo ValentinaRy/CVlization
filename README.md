@@ -6,7 +6,7 @@ CVlization (*CV + civilization*) is a local-first browser companion for job appl
 
 Built as a learning project with TypeScript and browser extensions, with public development on GitHub. Desktop Chromium browsers are the target, with Brave as the primary test browser.
 
-> 🚩 **Current stage: 02 — Local workspace.** A first JSON write/read experiment is available. Profile storage, autofill, tracking, and document generation are not implemented yet.
+> 🚩 **Current stage: 02 — Local workspace.** Named local resumes and a basic-details editor are available. Career-history editing, autofill, tracking, and document generation are planned.
 
 ## The idea
 
@@ -23,12 +23,14 @@ The core workflow is intended to run without an account or our own backend. Opti
 
 - A Manifest V3 extension shell with a toolbar popup and a full-tab dashboard.
 - A workspace connection panel that remembers the selected folder in this browser, checks access on reopening, and offers Reconnect when permission is needed.
-- A dashboard experiment that writes a fictional user to a new JSON file in a selected folder and reads it back for visual comparison.
+- A dashboard listing workspace JSON files and a separate basic resume editor.
+- Optional basic details, address, and multiple social profiles, with combined name and phone values.
+- Explicit Save to a named JSON file, filename validation, unsaved-change indication, and detection of files changed since opening.
 - TypeScript checking and a Vite build for local installation.
 - A build watcher for development and a package sanity check.
-- A GitHub Actions workflow that checks and builds the project.
+- Vitest business-logic tests and a GitHub Actions workflow that tests and builds the project.
 
-The manifest requests no extension permissions. Workspace access is granted through the browser picker. The extension remembers a directory handle in local browser storage, checks folder availability, and reads the test files it creates. Profile data is not stored in the browser. It makes no network requests and reads no websites. The feature cards describe future work.
+The manifest requests no extension permissions. Workspace access is granted through the browser picker. The extension remembers a directory handle in local browser storage, checks folder availability, and reads and writes user-selected resume files. Resume files are the source of truth; unsaved edits live only in the current page. It makes no network requests and reads no websites. The feature cards describe future work.
 
 ## Run locally
 
@@ -36,6 +38,7 @@ Install **Node.js 24 LTS**, including npm, and Git. If you use nvm, run `nvm ins
 
 ```sh
 npm ci
+npm test
 npm run build
 npm run check:dist
 ```
@@ -61,7 +64,11 @@ Use DevTools to inspect the dashboard, or right-click the popup and choose **Ins
 
 ### Brave and workspace access
 
-The file experiment may require enabling **File System Access API** at `brave://flags/#file-system-access-api`, followed by a browser restart. In the dashboard, choose a dedicated test folder, write the fictional user, and read the file back. Each write creates a new `cvlization-test-user-<id>.json` file. The folder handle is remembered in this browser. After reopening or restarting, check the folder name and connection state; use **Reconnect** to grant access again, or **Choose folder** if the folder cannot be restored. Clearing extension storage may require selecting it again. The experiment's last test file is remembered only in the current tab, so write a new test file before reading after reopening.
+Folder access may require enabling **File System Access API** at `brave://flags/#file-system-access-api`, followed by a browser restart. Choose a dedicated workspace folder, then use **Create resume** or open a saved CVlization JSON file. Enter a filename without `.json`; all resume content is optional. **Save** writes the file, and changing an existing filename saves a separate copy.
+
+The folder handle is remembered in this browser. After reopening or restarting, check the folder name and use **Reconnect** if necessary. Clearing extension storage may require selecting it again. Existing files changed on disk since opening are not silently overwritten: keep the draft under a different name or reopen the file.
+
+The editor currently handles basic details only. External JSON Resume import and recovery of unsaved drafts after a crash are planned; navigation warnings are not a backup. The old fictional experiment files are not CVlization resumes and cannot be opened in the new editor.
 
 ## Roadmap
 
@@ -101,9 +108,12 @@ CVlization/
 ├── src/
 │   ├── dashboard/        # Full-tab application UI
 │   ├── popup/            # Toolbar popup
-│   └── shared/           # Shared styling and future common modules
+│   ├── resume/           # Editor, model, persistence, and tests
+│   ├── workspace/        # Folder permissions and handle storage
+│   └── shared/           # Shared styling
 ├── dashboard.html
 ├── popup.html
+├── resume.html
 ├── package.json
 ├── package-lock.json
 ├── tsconfig.json
@@ -123,11 +133,12 @@ See the [current extension architecture](docs/architecture.md). Working design n
 Before submitting a change:
 
 ```sh
+npm test
 npm run build
 npm run check:dist
 ```
 
-For UI and extension behavior, also perform the relevant manual check in Brave. The initial automated check validates packaging, not real-world form compatibility.
+The owner performs manual Brave acceptance. Automated tests cover model transformations and persistence decisions; they do not verify browser permission prompts or real filesystem integration.
 
 ## Distribution
 

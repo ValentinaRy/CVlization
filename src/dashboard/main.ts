@@ -1,5 +1,5 @@
 import '../shared/styles.css';
-import './workspace-experiment';
+import './workspace';
 
 const buildInfo = document.querySelector<HTMLParagraphElement>('#build-info');
 if (buildInfo) {

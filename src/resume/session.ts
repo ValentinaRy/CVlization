@@ -1,3 +1,5 @@
+import { applySkillsLanguages, languagesToDraft, skillsToDraft } from './skills-languages';
+import type { SkillDraft, LanguageDraft } from './skills-languages';
 import { applyEducation, educationToDraft } from './education';
 import type { EducationDraft } from './education';
 import { applyWork, workToDraft } from './work';
@@ -12,6 +14,8 @@ export class ResumeSession {
   draft: BasicsDraft;
   work: WorkDraft[];
   education: EducationDraft[];
+  skills: SkillDraft[];
+  languages: LanguageDraft[];
   filename: string;
   original?: SavedResume;
   private resume: Resume;
@@ -24,10 +28,12 @@ export class ResumeSession {
     this.draft = toDraft(this.resume);
     this.work = workToDraft(this.resume.work);
     this.education = educationToDraft(this.resume.education);
+    this.skills = skillsToDraft(this.resume.skills);
+    this.languages = languagesToDraft(this.resume.languages);
     this.filename = filename;
     this.baseline = this.snapshot();
   }
-  private snapshot() { return JSON.stringify([this.filename, this.draft, this.work, this.education]); }
+  private snapshot() { return JSON.stringify([this.filename, this.draft, this.work, this.education, this.skills, this.languages]); }
   get dirty() { return this.snapshot() !== this.baseline; }
   get isCopy() { return !!this.original && `${this.filename.trim()}.json` !== this.original.filename; }
 
@@ -36,7 +42,10 @@ export class ResumeSession {
     this.saving = true;
     const snapshot = this.snapshot();
     try {
-      const resume = applyEducation(applyWork(applyBasics(this.resume, this.draft), this.work), this.education);
+      const resume = applySkillsLanguages(
+        applyEducation(applyWork(applyBasics(this.resume, this.draft), this.work), this.education),
+        this.skills, this.languages,
+      );
       if (this.isCopy) resume.id = crypto.randomUUID();
       const saved = await persist(this.filename.trim(), resume, this.original);
       this.original = saved;

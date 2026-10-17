@@ -1,3 +1,5 @@
+import { proficiencyEditor } from './proficiency-editor';
+import { languageLevels, newLanguageDraft, newSkillDraft, skillLevels } from './skills-languages';
 import { educationEditor } from './education-editor';
 import { workEditor } from './work-editor';
 import '../shared/styles.css';
@@ -139,6 +141,8 @@ function renderForm() {
   }
   filename.value = session!.filename;
   renderProfiles();
+  proficiencyEditor(document.querySelector<HTMLElement>('#skills-inputs')!, document.querySelector<HTMLButtonElement>('#add-skill')!, session!.skills, newSkillDraft, { singular: 'Skill', plural: 'Skills', levels: skillLevels }, renderState);
+  proficiencyEditor(document.querySelector<HTMLElement>('#languages-inputs')!, document.querySelector<HTMLButtonElement>('#add-language')!, session!.languages, newLanguageDraft, { singular: 'Language', plural: 'Languages', levels: languageLevels }, renderState);
   workForm = workEditor(document.querySelector<HTMLElement>('#work-inputs')!, document.querySelector<HTMLButtonElement>('#add-work')!, session!.work, renderState);
   educationForm = educationEditor(document.querySelector<HTMLElement>('#education-inputs')!, document.querySelector<HTMLButtonElement>('#add-education')!, session!.education, renderState);
   form.hidden = false;

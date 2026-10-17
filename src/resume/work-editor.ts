@@ -1,5 +1,6 @@
+import { dateRangeErrors } from './dates';
 import { dateControl } from './date-control';
-import { newWorkDraft, workDateErrors, workTextFields } from './work';
+import { newWorkDraft, workTextFields } from './work';
 import type { WorkDraft } from './work';
 
 export function workEditor(container: HTMLElement, add: HTMLButtonElement, drafts: WorkDraft[], onChange: () => void) {
@@ -15,7 +16,7 @@ export function workEditor(container: HTMLElement, add: HTMLButtonElement, draft
       row.legend.textContent = `Position ${index + 1}`;
       row.remove.setAttribute('aria-label', `Remove position ${index + 1}`);
       row.to.setDisabled(row.draft.current);
-      const errors = workDateErrors(row.draft);
+      const errors = dateRangeErrors(row.draft);
       row.from.setError(errors.startDate);
       row.to.setError(errors.endDate);
     });
@@ -25,7 +26,7 @@ export function workEditor(container: HTMLElement, add: HTMLButtonElement, draft
     // DOM identifiers are independent of user-controlled IDs read from disk.
     const prefix = `work-${crypto.randomUUID()}`;
     const root = document.createElement('fieldset');
-    root.className = 'work-entry';
+    root.className = 'dated-entry';
     const legend = document.createElement('legend');
     const grid = document.createElement('div');
     grid.className = 'form-grid';
@@ -48,7 +49,7 @@ export function workEditor(container: HTMLElement, add: HTMLButtonElement, draft
     const from = dateControl(`${prefix}-from`, 'From', draft.startDate, value => { draft.startDate = value; changed(); });
     const to = dateControl(`${prefix}-to`, 'To', draft.endDate, value => { draft.endDate = value; changed(); });
     const dates = document.createElement('div');
-    dates.className = 'form-grid full-width work-dates';
+    dates.className = 'form-grid full-width entry-dates';
     dates.append(from.root, to.root);
     grid.append(dates);
     const currentLabel = document.createElement('label');

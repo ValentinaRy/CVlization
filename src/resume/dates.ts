@@ -36,3 +36,19 @@ export function formatDateForInput(stored: string = ''): string {
     return stored;
   }
 }
+
+export type DateRangeErrors = { startDate?: string; endDate?: string };
+
+export function dateRangeErrors(draft: { startDate: string; endDate: string; current: boolean }): DateRangeErrors {
+  const errors: DateRangeErrors = {};
+  let start: string | undefined;
+  let end: string | undefined;
+  try { start = parseDateInput(draft.startDate); }
+  catch (error) { errors.startDate = (error as Error).message; }
+  if (!draft.current) {
+    try { end = parseDateInput(draft.endDate); }
+    catch (error) { errors.endDate = (error as Error).message; }
+    if (start && end && end <= start) errors.endDate = 'To must be later than From.';
+  }
+  return errors;
+}

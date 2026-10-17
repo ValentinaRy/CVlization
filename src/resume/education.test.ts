@@ -58,7 +58,7 @@ describe('education data', () => {
     expect(drafts[0]!.endDate).toBe('01/01/2020');
     expect(drafts[1]!.endDate).toBe('bad date');
     drafts[0]!.current = false;
-    expect(dateRangeErrors(drafts[0]!).endDate).toBe('To must be later than From.');
+    expect(dateRangeErrors(drafts[0]!).endDate).toBe('To must be on or after From.');
     drafts[1]!.current = false;
     expect(dateRangeErrors(drafts[1]!).endDate).toBeDefined();
   });
@@ -71,7 +71,7 @@ describe('education data', () => {
     expect(result.education![1]).not.toHaveProperty('startDate');
   });
   it.each([
-    ['29/02/2026', '01/03/2026'], ['01/09/2026', '01/09/2026'], ['01/09/2026', '31/08/2026'],
+    ['29/02/2026', '01/03/2026'], ['01/09/2026', '31/08/2026'],
   ])('rejects invalid or unordered dates %s to %s', (startDate, endDate) => {
     const draft = Object.assign(newEducationDraft(), { startDate, endDate });
     expect(() => applyEducation(newResume(), [draft])).toThrow('Education 1');
@@ -158,7 +158,7 @@ describe('education save lifecycle', () => {
     const draft = Object.assign(newEducationDraft(), { institution: 'Example', startDate: '01/09/2026', endDate: '01/08/2026' });
     session.education.push(draft);
     const persist = vi.fn(async () => { throw new Error('Disk unavailable'); });
-    await expect(session.save(persist)).rejects.toThrow('later');
+    await expect(session.save(persist)).rejects.toThrow('on or after');
     expect(persist).not.toHaveBeenCalled();
     draft.current = true;
     await expect(session.save(persist)).rejects.toThrow('Disk unavailable');

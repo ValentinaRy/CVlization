@@ -72,12 +72,13 @@ describe('work model', () => {
     expect(entries[0]!.current).toBe(false);
     expect(entries[1]).not.toHaveProperty('endDate');
   });
-  it('requires To strictly after From only when both dates are supplied and position is not current', () => {
+  it('allows equal dates and requires To on or after From when both dates are supplied and position is not current', () => {
     const draft = newWorkDraft();
     Object.assign(draft, { startDate: '06/2030', endDate: '01/06/2030' });
-    expect(dateRangeErrors(draft).endDate).toBe('To must be later than From.');
+    expect(dateRangeErrors(draft)).toEqual({});
+    expect(applyWork(newResume(), [draft]).work![0]).toMatchObject({ startDate: '2030-06-01', endDate: '2030-06-01' });
     draft.endDate = '05/2030';
-    expect(() => applyWork(newResume(), [draft])).toThrow('later');
+    expect(() => applyWork(newResume(), [draft])).toThrow('on or after');
     draft.endDate = '02/06/2030';
     expect(dateRangeErrors(draft)).toEqual({});
     draft.startDate = '';
@@ -123,7 +124,7 @@ describe('work save lifecycle', () => {
     session.work.push(entry);
     expect(session.dirty).toBe(true);
     const persist = vi.fn(async () => { throw new Error('Disk unavailable'); });
-    await expect(session.save(persist)).rejects.toThrow('later');
+    await expect(session.save(persist)).rejects.toThrow('on or after');
     expect(persist).not.toHaveBeenCalled();
     expect(session.saving).toBe(false);
     entry.current = true;
@@ -164,7 +165,7 @@ describe('date presentation', () => {
     Object.assign(draft, { startDate: '31/12/2026', endDate: '01/01/2027' });
     expect(dateRangeErrors(draft)).toEqual({});
     draft.endDate = '01/12/2026';
-    expect(dateRangeErrors(draft).endDate).toBe('To must be later than From.');
+    expect(dateRangeErrors(draft).endDate).toBe('To must be on or after From.');
   });
 });
 

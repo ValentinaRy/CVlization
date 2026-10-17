@@ -144,3 +144,9 @@ footer p { margin-bottom: 6px; }
 .tag-list li span { overflow-wrap: anywhere; min-width: 0; white-space: pre-wrap; }
 .dashboard .tag-remove { flex-shrink: 0; padding: 2px 8px; min-width: 30px; min-height: 30px; border: 0; color: var(--color-accent); background: transparent; }
 .dashboard .tag-remove:hover:not(:disabled) { background: var(--color-lilac); }
+
+.section-controls { position: relative; margin: 28px 0; }
+.section-menu { position: absolute; top: 100%; left: 0; z-index: 20; width: min(300px, 100%); padding: 8px; margin: 8px 0 0; list-style: none; border: 1px solid var(--color-border); border-radius: var(--radius-control); background: var(--color-surface); box-shadow: var(--shadow-soft); }
+.section-menu li + li { margin-top: 6px; }
+.section-menu button { width: 100%; text-align: left; }
+.remove-section { margin-top: 20px; }

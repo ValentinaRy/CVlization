@@ -1,3 +1,4 @@
+import { optionalSectionsEditor } from './optional-sections-editor';
 import { proficiencyEditor } from './proficiency-editor';
 import { languageLevels, newLanguageDraft, newSkillDraft, skillLevels } from './skills-languages';
 import { educationEditor } from './education-editor';
@@ -25,6 +26,7 @@ const save = document.querySelector<HTMLButtonElement>('#save-resume')!;
 const warnings = document.querySelector<HTMLElement>('#draft-warnings')!;
 const profileContainer = document.querySelector<HTMLElement>('#profile-inputs')!;
 const addProfile = document.querySelector<HTMLButtonElement>('#add-profile')!;
+let optionalForm: ReturnType<typeof optionalSectionsEditor> | undefined;
 let educationForm: ReturnType<typeof educationEditor> | undefined;
 let workForm: ReturnType<typeof workEditor> | undefined;
 let folder: FileSystemDirectoryHandle | undefined;
@@ -145,6 +147,7 @@ function renderForm() {
   proficiencyEditor(document.querySelector<HTMLElement>('#languages-inputs')!, document.querySelector<HTMLButtonElement>('#add-language')!, session!.languages, newLanguageDraft, { singular: 'Language', plural: 'Languages', levels: languageLevels }, renderState);
   workForm = workEditor(document.querySelector<HTMLElement>('#work-inputs')!, document.querySelector<HTMLButtonElement>('#add-work')!, session!.work, renderState);
   educationForm = educationEditor(document.querySelector<HTMLElement>('#education-inputs')!, document.querySelector<HTMLButtonElement>('#add-education')!, session!.education, renderState);
+  optionalForm = optionalSectionsEditor(document.querySelector<HTMLElement>('#optional-sections')!, document.querySelector<HTMLElement>('#section-controls')!, document.querySelector<HTMLButtonElement>('#add-section')!, document.querySelector<HTMLElement>('#section-menu')!, session!.optional, renderState);
   form.hidden = false;
   renderState();
 }
@@ -203,7 +206,7 @@ form.addEventListener('submit', async event => {
   event.preventDefault();
   if (!folder || !session || busy) return;
   if (filenameError(session.filename)) { renderState(); filename.focus(); return; }
-  if (workForm?.focusFirstError() || educationForm?.focusFirstError()) return;
+  if (workForm?.focusFirstError() || educationForm?.focusFirstError() || optionalForm?.focusFirstError()) return;
   busy = true;
   errorBox.hidden = true;
   renderState();

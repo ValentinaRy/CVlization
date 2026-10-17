@@ -10,7 +10,9 @@ Vite compiles two HTML entry points into `dist/` and copies `public/manifest.jso
 
 - `popup.html` and `src/popup/main.ts` implement the toolbar popup. Its button opens the extension's options page in a browser tab.
 - `dashboard.html` and `src/dashboard/main.ts` implement that full-tab page. It displays the current development stage and reads the installed version from the manifest.
-- `src/dashboard/workspace-experiment.ts` implements the manual file experiment. Directory and file handles stay in memory for the current page. Each write uses a new test filename and each read fetches the file again from disk.
+- `src/dashboard/workspace-experiment.ts` implements the manual file experiment. It renders workspace connection states and the file experiment. The latest test file handle stays in memory for the current page. Each write uses a new test filename and each read fetches the file again from disk.
+- `src/workspace/access.ts` checks read/write permission and folder availability without writing probe files. Permission requests happen only on a Reconnect click; restore and focus checks never prompt.
+- `src/workspace/handle-store.ts` stores only the selected directory handle in IndexedDB. File contents remain in the selected folder. If browser storage cannot restore the handle, the user can select the folder again.
 - `src/shared/styles.css` supplies the styling for both pages.
 - `public/manifest.json` declares the popup and the full-tab options page. No permissions are requested by the current scaffold.
 

@@ -92,3 +92,11 @@ footer p { margin-bottom: 6px; }
   .json-comparison { grid-template-columns: 1fr; }
   .experiment-actions { flex-direction: column; }
 }
+
+.workspace-summary { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-top: 24px; padding: 16px; border-radius: var(--radius-control); background: var(--color-lilac); }
+.workspace-summary p { margin: 0; }
+#workspace-name { font-weight: 600; overflow-wrap: anywhere; }
+.workspace-summary > div { min-width: 0; }
+#workspace-state { flex-shrink: 0; }
+#workspace-state[data-state="permission-required"], #workspace-state[data-state="unavailable"], #workspace-state[data-state="unsupported"] { color: var(--color-error); border-color: currentColor; }
+@media (max-width: 650px) { .workspace-summary { align-items: flex-start; flex-direction: column; } }

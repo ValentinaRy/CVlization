@@ -28,12 +28,21 @@
         <p class="eyebrow">A small experiment</p>
         <h2 id="experiment-title">A little home for your data</h2>
         <p>Choose a dedicated test folder, write the fictional user below, then read the file back and compare the values.</p>
-        <div class="experiment-actions" aria-label="File experiment actions">
-          <button id="choose-test-folder" type="button">1. Choose folder</button>
-          <button id="write-test-file" type="button" disabled>2. Write test file</button>
-          <button id="read-test-file" type="button" disabled>3. Read test file</button>
+        <div class="workspace-summary">
+          <div><p class="eyebrow">Your workspace</p><p id="workspace-name">No folder selected</p></div>
+          <span id="workspace-state" class="badge" role="status">Checking access…</span>
         </div>
-        <p id="test-location" class="note">No folder selected.</p>
+        <div class="experiment-actions" aria-label="Workspace connection">
+          <button id="choose-test-folder" type="button" disabled>Choose folder</button>
+          <button id="reconnect-workspace" type="button" disabled hidden>Reconnect</button>
+        </div>
+        <p id="workspace-status" class="note" role="status">Looking for your saved folder…</p>
+        <p id="workspace-warning" class="note" role="status"></p>
+        <div class="experiment-actions" aria-label="File experiment actions">
+          <button id="write-test-file" type="button" disabled>Write test file</button>
+          <button id="read-test-file" type="button" disabled>Read test file</button>
+        </div>
+        <p id="test-location" class="note">No test file written in this tab.</p>
         <p id="test-status" class="note" role="status" aria-live="polite">Start by choosing a test folder.</p>
         <div class="json-comparison">
           <div>
@@ -45,7 +54,7 @@
             <pre id="test-result" aria-labelledby="result-title">No file read yet.</pre>
           </div>
         </div>
-        <p class="note">Each write creates a new test file. Reopening this page resets the selection; files remain in your folder.</p>
+        <p class="note">Your folder is remembered in this browser. Reopening may require Reconnect. Each write creates a new test file; Read uses the latest file written in this tab.</p>
       </section>
       <section class="feature-grid" aria-label="Planned features">
         <article><p class="eyebrow">Planned</p><h2>Your profile</h2><p>Keep experience, education, and documents together in a folder you choose.</p></article>

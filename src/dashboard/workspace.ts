@@ -63,7 +63,7 @@ async function refreshFiles() {
   try {
     const entries = (await listEntries(folder)).filter(entry => entry.kind === 'file' && entry.name.toLowerCase().endsWith('.json'));
     filesStatus.textContent = entries.length
-      ? 'JSON files in this folder. Open a CVlization resume to edit its basic details.'
+      ? 'JSON files in this folder. Open a CVlization resume to edit it.'
       : 'Your next chapter starts here. Create your first resume.';
     filesStatus.dataset.state = 'info';
     for (const entry of entries) {

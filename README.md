@@ -6,7 +6,7 @@ CVlization (*CV + civilization*) is a local-first browser companion for job appl
 
 Built as a learning project with TypeScript and browser extensions, with public development on GitHub. Desktop Chromium browsers are the target, with Brave as the primary test browser.
 
-> 🚩 **Current stage: 02 — Local workspace.** Named local resumes and a basic-details editor are available. Career-history editing, autofill, tracking, and document generation are planned.
+> 🚩 **Current stage: 02 — Local workspace.** Named local resumes, basic details, and work experience editing are available. Education, autofill, tracking, and document generation are planned.
 
 ## The idea
 
@@ -23,8 +23,9 @@ The core workflow is intended to run without an account or our own backend. Opti
 
 - A Manifest V3 extension shell with a toolbar popup and a full-tab dashboard.
 - A workspace connection panel that remembers the selected folder in this browser, checks access on reopening, and offers Reconnect when permission is needed.
-- A dashboard listing workspace JSON files and a separate basic resume editor.
+- A dashboard listing workspace JSON files and a separate resume editor.
 - Optional basic details, country name, address, and multiple social profiles; combined name and phone values are generated on save.
+- Multiple work positions with dates, current-position flags, summaries, and multiline highlights.
 - Explicit Save to a named JSON file, filename validation, unsaved-change indication, and detection of files changed since opening.
 - TypeScript checking and a Vite build for local installation.
 - A build watcher for development and a package sanity check.
@@ -68,7 +69,7 @@ Folder access may require enabling **File System Access API** at `brave://flags/
 
 The folder handle is remembered in this browser. After reopening or restarting, check the folder name and use **Reconnect** if necessary. Clearing extension storage may require selecting it again. Existing files changed on disk since opening are not silently overwritten: keep the draft under a different name or reopen the file.
 
-The editor currently handles basic details only. External JSON Resume import and recovery of unsaved drafts after a crash are planned; navigation warnings are not a backup. The old fictional experiment files are not CVlization resumes and cannot be opened in the new editor.
+The editor currently handles basic details and work experience. Dates display DD/MM/YYYY and accept manual input or a calendar opened by clicking the field (Alt+Down with the keyboard). MM/YYYY input uses day 01; JSON stores YYYY-MM-DD. Saved highlights reopen with a leading `- ` on each item. Current positions omit the end date, and several positions can be current. External JSON Resume import and recovery of unsaved drafts after a crash are planned; navigation warnings are not a backup. The old fictional experiment files are not CVlization resumes and cannot be opened in the new editor.
 
 ## Roadmap
 

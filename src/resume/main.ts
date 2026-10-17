@@ -1,3 +1,4 @@
+import { workEditor } from './work-editor';
 import '../shared/styles.css';
 import { inspectWorkspace, reconnectWorkspace, workspaceMessage } from '../workspace/access';
 import { loadWorkspace } from '../workspace/handle-store';
@@ -21,6 +22,7 @@ const save = document.querySelector<HTMLButtonElement>('#save-resume')!;
 const warnings = document.querySelector<HTMLElement>('#draft-warnings')!;
 const profileContainer = document.querySelector<HTMLElement>('#profile-inputs')!;
 const addProfile = document.querySelector<HTMLButtonElement>('#add-profile')!;
+let workForm: ReturnType<typeof workEditor> | undefined;
 let folder: FileSystemDirectoryHandle | undefined;
 let session: ResumeSession | undefined;
 let entries: string[] = [];
@@ -135,6 +137,7 @@ function renderForm() {
   }
   filename.value = session!.filename;
   renderProfiles();
+  workForm = workEditor(document.querySelector<HTMLElement>('#work-inputs')!, document.querySelector<HTMLButtonElement>('#add-work')!, session!.work, renderState);
   form.hidden = false;
   renderState();
 }
@@ -193,6 +196,7 @@ form.addEventListener('submit', async event => {
   event.preventDefault();
   if (!folder || !session || busy) return;
   if (filenameError(session.filename)) { renderState(); filename.focus(); return; }
+  if (workForm?.focusFirstError()) return;
   busy = true;
   errorBox.hidden = true;
   renderState();

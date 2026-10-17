@@ -1,3 +1,5 @@
+import { validateWorkEntries } from './work';
+import type { WorkEntry } from './work';
 export const basicFields = ['firstName', 'lastName', 'label', 'email', 'phoneCountryCode', 'phoneNumber', 'url', 'summary'] as const;
 export const locationFields = ['address', 'postalCode', 'city', 'country', 'region'] as const;
 export const profileFields = ['network', 'username', 'url'] as const;
@@ -7,7 +9,7 @@ export type Basics = JsonObject & Partial<Record<typeof basicFields[number] | 'n
   location?: JsonObject & Partial<Record<typeof locationFields[number] | 'countryCode', string>>;
   profiles?: Profile[];
 };
-export type Resume = JsonObject & { schemaVersion: 1; id: string; basics: Basics };
+export type Resume = JsonObject & { schemaVersion: 1; id: string; basics: Basics; work?: WorkEntry[] };
 export type BasicsDraft = Record<typeof basicFields[number], string> & {
   location: Record<typeof locationFields[number], string>;
   profiles: Profile[];
@@ -54,6 +56,7 @@ export function parseResume(text: string): Resume {
       throw new Error(`${section} must be a list of objects. The file has not been changed.`);
     }
   }
+  if (Array.isArray(value.work)) validateWorkEntries(value.work);
   return value as Resume;
 }
 

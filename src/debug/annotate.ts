@@ -2,24 +2,56 @@ import { debugTheme } from './theme';
 import { controlKinds, dateParts, elements, meanings, repeatedMeaning } from './model';
 import type { Capture, Annotations, Label, Observation } from './model';
 
-export const annotationCss = `${debugTheme}.cvl-annotation{display:flex!important;position:static!important;flex-wrap:wrap!important;align-items:center!important;gap:8px!important;clear:both!important;margin:8px 0!important;padding:10px!important;border:3px solid var(--debug-border)!important;border-radius:10px!important;background:var(--debug-surface)!important;color:var(--debug-text)!important;font:13px/1.4 system-ui!important;min-width:220px!important;max-width:100%!important;box-sizing:border-box!important;pointer-events:auto!important}.cvl-annotation label{display:flex!important;flex-direction:column!important;color:var(--debug-text)!important;font:12px/1.4 system-ui!important;max-width:100%!important}.cvl-annotation select{font:13px system-ui!important;background:var(--debug-input)!important;color:var(--debug-text)!important;border:1px solid var(--debug-border)!important;border-radius:6px!important;padding:6px!important;max-width:260px!important;width:auto!important}.cvl-annotation select:focus{outline:3px solid var(--debug-focus)!important}.cvl-annotation [hidden]{display:none!important}.cvl-annotation small{width:100%;overflow-wrap:anywhere}`;
+export const annotationCss = `${debugTheme}.cvl-annotation{display:flex!important;position:static!important;flex-wrap:wrap!important;align-items:center!important;gap:8px!important;clear:both!important;margin:8px 0!important;padding:10px!important;border:3px solid var(--debug-border)!important;border-radius:10px!important;background:var(--debug-surface)!important;color:var(--debug-text)!important;font:13px/1.4 system-ui!important;min-width:0!important;width:100%!important;max-width:100%!important;box-sizing:border-box!important;pointer-events:auto!important}.cvl-annotation label{display:flex!important;flex-direction:column!important;color:var(--debug-text)!important;font:12px/1.4 system-ui!important;max-width:100%!important}.cvl-annotation select{font:13px system-ui!important;background:var(--debug-input)!important;color:var(--debug-text)!important;border:1px solid var(--debug-border)!important;border-radius:6px!important;padding:6px!important;min-width:0!important;max-width:100%!important;width:auto!important}.cvl-annotation select:focus{outline:3px solid var(--debug-focus)!important}.cvl-annotation [hidden]{display:none!important}.cvl-annotation small{width:100%;overflow-wrap:anywhere}`;
+
+// Normal document flow is more useful than narrow source columns for annotation.
+// Important rules override the inline computed styles in the reconstruction.
+const flowCss = `
+.cvl-annotation-flow {
+  display: block !important;
+  position: static !important;
+  width: auto !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
+  height: auto !important;
+  min-height: 0 !important;
+  margin: 0 0 12px !important;
+  grid-area: auto !important;
+  flex: none !important;
+}
+.cvl-annotated-control {
+  display: block !important;
+  position: static !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
+  margin: 0 !important;
+  grid-area: auto !important;
+  flex: none !important;
+}
+`;
 
 export function mountAnnotations(capture: Capture, labels: Annotations['labels'], doc: Document, hidden: HTMLElement, changed: () => void) {
-  const style = doc.createElement('style'); style.textContent = annotationCss; doc.head.append(style);
-  // Only the annotation view reflows. Captured layout evidence remains immutable.
-  for (const container of doc.querySelectorAll<HTMLElement>('[data-observation-id]')) {
-    if (!['INPUT', 'SELECT', 'TEXTAREA', 'BUTTON', 'OPTION'].includes(container.tagName)) container.style.height = 'auto';
-  }
+  const style = doc.createElement('style'); style.textContent = annotationCss + flowCss; doc.head.append(style);
   hidden.replaceChildren();
   doc.addEventListener('submit', event => event.preventDefault());
-  for (const node of elements(capture.page.tree).filter(item => item.control)) {
+  // Decide visibility before changing layout; only the viewer gets these classes.
+  const controls = elements(capture.page.tree).filter(item => item.control).map(node => {
     const target = doc.querySelector<HTMLElement>(`[data-observation-id="${node.id}"]`);
-    const positioned = node.visible && target && target.getClientRects().length > 0;
+    return { node, target, positioned: !!(node.visible && target && target.getClientRects().length > 0) };
+  });
+  for (const { target, positioned } of controls) {
+    if (!positioned || !target) continue;
+    target.classList.add('cvl-annotated-control');
+    // Wrapping just the immediate parent leaves fixed-width grid/flex columns
+    // higher up unchanged. Give every containing row space for its panels.
+    for (let parent = target.parentElement; parent && parent !== doc.body; parent = parent.parentElement) {
+      if (parent.hasAttribute('data-observation-id')) parent.classList.add('cvl-annotation-flow');
+    }
+  }
+  for (const { node, target, positioned } of controls) {
     const owner = positioned ? doc : hidden.ownerDocument;
     const panel = makePanel(owner, node, labels, changed);
-    if (positioned) {
-      panel.style.gridColumn = '1 / -1'; panel.style.flexBasis = '100%';
-      if (target.parentElement) target.parentElement.style.flexWrap = 'wrap';
+    if (positioned && target) {
       target.after(panel);
     } else hidden.append(panel);
   }

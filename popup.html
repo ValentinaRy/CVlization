@@ -11,6 +11,16 @@
       <h1>CV<span>lization</span></h1>
       <p>Less stress. More possibility.</p>
       <button id="open-dashboard" type="button">Open CVlization <span aria-hidden="true">↗</span></button>
+      <button id="debug-toggle" type="button">Debug this page</button>
+      <form id="debug-capture-form" hidden>
+        <label for="debug-capture-name">Capture name</label>
+        <input id="debug-capture-name" required placeholder="e.g. Greenhouse — page 2" autocomplete="off" />
+        <label class="debug-values"><input id="debug-values" type="checkbox" checked /> Include current field values</label>
+        <p class="note">Passwords, hidden input values and file contents are omitted in both modes.</p>
+        <button type="submit">Capture and annotate</button>
+        <button id="debug-cancel" type="button">Cancel</button>
+      </form>
+      <button id="debug-library" type="button">Open debug captures</button>
       <p class="note" id="popup-status" role="status">Early preview · Local workspace</p>
     </main>
     <script type="module" src="/src/popup/main.ts"></script>

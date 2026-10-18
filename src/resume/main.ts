@@ -9,7 +9,9 @@ import { loadWorkspace } from '../workspace/handle-store';
 import { assertAvailable, filenameError, suggestedFilename } from './filenames';
 import { draftWarnings, locationFields, profileFields } from './model';
 import type { BasicsDraft } from './model';
-import { listEntries, readResume, writeResume } from './repository';
+import { listEntries, readResume } from './repository';
+import { writeResumeWithDocuments } from './document-repository';
+import { documentEditor } from './document-editor';
 import { ResumeSession } from './session';
 
 const form = document.querySelector<HTMLFormElement>('#resume-form')!;
@@ -142,6 +144,7 @@ function renderForm() {
     inputField(location, key, labels[key], session!.draft.location[key], value => { session!.draft.location[key] = value; }, { multiline: key === 'address' });
   }
   filename.value = session!.filename;
+  documentEditor(document.querySelector<HTMLElement>('#document-inputs')!, session!, folder!, renderState, value => { busy = value; renderState(); });
   renderProfiles();
   proficiencyEditor(document.querySelector<HTMLElement>('#skills-inputs')!, document.querySelector<HTMLButtonElement>('#add-skill')!, session!.skills, newSkillDraft, { singular: 'Skill', plural: 'Skills', levels: skillLevels }, renderState);
   proficiencyEditor(document.querySelector<HTMLElement>('#languages-inputs')!, document.querySelector<HTMLButtonElement>('#add-language')!, session!.languages, newLanguageDraft, { singular: 'Language', plural: 'Languages', levels: languageLevels }, renderState);
@@ -215,7 +218,7 @@ form.addEventListener('submit', async event => {
     await navigator.locks.request('cvlization-resume-write', async () => {
       await checkAccess();
       if (!connected) throw new Error('Reconnect your folder before saving. Your draft is still here.');
-      await session!.save((base, resume, original) => writeResume(folder!, base, resume, original));
+      await session!.save((base, resume, original, documents) => writeResumeWithDocuments(folder!, base, resume, original, documents));
     });
     saveFailed = false;
     const destination = new URL('dashboard.html', window.location.href);

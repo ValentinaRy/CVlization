@@ -30,6 +30,8 @@ The core workflow is intended to run without an account or our own backend. Opti
 - Skills and languages above Work, with optional descriptive levels; skill keywords use removable tags.
 - Add section below Education for volunteer experience, awards, certificates, publications, interests, references, and projects; add/remove entries or entire sections.
 - Explicit Save to a named JSON file, filename validation, unsaved-change indication, and detection of files changed since opening.
+- One PDF and one photo per resume, copied into the workspace on Save with matching filenames and local previews. PDF bytes are preserved; PNG/JPEG photos become white-background JPEGs up to 1600 pixels and 2 MB, without retaining the source photo in the workspace.
+- Replace or detach attachments through the editor. Previously saved copies remain on disk; automatic file cleanup is deferred.
 - TypeScript checking and a Vite build for local installation.
 - A build watcher for development and a package sanity check.
 - Vitest business-logic tests and a GitHub Actions workflow that tests and builds the project.

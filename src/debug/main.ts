@@ -76,7 +76,7 @@ async function open(name: string) {
       get('debug-hidden').hidden = !hidden.children.length;
       resize();
     };
-    frame.style.width = `${Math.max(320, Math.min(saved.capture.page.viewport.width, 3000))}px`;
+    frame.style.width = '100%';
     frame.srcdoc = html;
     renderSaveState();
   } catch (value) {

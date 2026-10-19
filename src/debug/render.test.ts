@@ -32,8 +32,28 @@ describe('inert local HTML', () => {
     capture.page.tree.styles = { color: 'red', 'background-image': 'url(https://example.com/track)', width: '1px; background:url(https://example.com/track)' };
     const html = renderCapture(capture);
     expect(html).toContain('type="button"');
-    expect(html).toContain('color:red');
+    expect(html).not.toContain('color:red');
     expect(html).not.toContain('example.com/track');
+  });
+  it('keeps links inline inside paragraphs and discards fixed layout for every source node', () => {
+    const capture = fixture();
+    capture.page.tree = {
+      ...observation('e1', 'p'),
+      styles: { height: '24px', width: '852px', 'margin-bottom': '-16px', display: 'grid' },
+      children: ['Read ', { ...observation('e2', 'a'), children: ['more'], styles: { display: 'inline' } }, '.'],
+    };
+    const original = JSON.stringify(capture);
+    const html = renderCapture(capture);
+    expect(html).toContain('Read <span data-observation-id="e2">more</span>.');
+    expect(html).not.toMatch(/height:24px|width:852px|margin-bottom:-16px|display:grid/);
+    expect(JSON.stringify(capture)).toBe(original);
+  });
+  it('preserves explicit hidden state without shrinking normal fields to source widget sizes', () => {
+    const capture = fixture();
+    capture.page.tree.styles = { width: '2px', height: '0px', display: 'none' };
+    const html = renderCapture(capture);
+    expect(html).toContain('hidden=""');
+    expect(html).not.toMatch(/width:2px|height:0px/);
   });
   it('exposes observation IDs and unavailable frame notes without including semantic labels', () => {
     const capture = fixture(); capture.page.tree = observation('e1', 'iframe'); capture.page.tree.boundary = 'Frame not accessible';

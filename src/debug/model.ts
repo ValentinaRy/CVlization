@@ -31,6 +31,7 @@ export const meanings: Record<string, string> = {
   'basics.label': 'Professional title', 'basics.summary': 'About you', 'basics.url': 'Website',
   'basics.location.address': 'Street address', 'basics.location.postalCode': 'Postal code', 'basics.location.city': 'City', 'basics.location.region': 'Region', 'basics.location.country': 'Country',
   'basics.profiles.url': 'Profile URL', 'basics.profiles.network': 'Profile network', 'basics.profiles.username': 'Profile username',
+  'basics.profiles.linkedin.url': 'LinkedIn URL', 'basics.profiles.github.url': 'GitHub URL',
   'documents.resume': 'Resume PDF', 'documents.photo': 'Photo', 'coverLetter': 'Cover letter',
   'work.name': 'Work · Company', 'work.position': 'Work · Position', 'work.location': 'Work · Location',
   'work.description': 'Work · Employer description', 'work.url': 'Work · URL', 'work.startDate': 'Work · From', 'work.endDate': 'Work · To',

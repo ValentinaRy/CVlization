@@ -1,15 +1,16 @@
 # Current extension architecture
 
-CVlization is a Manifest V3 extension built with TypeScript and Vite. It has a toolbar popup, a full-tab dashboard, and a separate resume editor. The manifest requests no extension permissions. There are no network calls, background workers, or website scripts.
+CVlization is a Manifest V3 extension built with TypeScript and Vite. It has a toolbar popup, a full-tab dashboard, a resume editor, and a debug viewer. The manifest requests `activeTab` and `scripting` for explicit, user-triggered website observation. There are no network calls, persistent host permissions, or background workers.
 
 ## Entry points
 
-- `popup.html` / `src/popup/main.ts`: open the dashboard through the extension options page.
+- `popup.html` / `src/popup/main.ts`: open the dashboard or debug library, or name and start a capture of the active tab.
+- `debug.html` / `src/debug/main.ts`: capture the source tab once, write a static bundle, and open local field annotations with autosave.
 - `dashboard.html` / `src/dashboard/main.ts`: display the development stage and workspace UI. `src/dashboard/workspace.ts` restores folder access and lists JSON files without reading their contents.
 - `resume.html` / `src/resume/main.ts`: edit optional basic details, country name, address, repeatable social profiles, skills, languages, work experience, and education. Derived name/phone values are generated on save and have no controls. A required filename is independent of the professional title. Opening an existing file validates it before enabling editing.
 - `src/shared/styles.css`: shared cotton-candy styling, including form controls.
 
-Vite bundles all three HTML entry points into `dist/` and copies the manifest. Development uses a build watcher rather than a web server; the browser extension is reloaded manually.
+Vite bundles all four HTML entry points into `dist/` and copies the manifest. Development uses a build watcher rather than a web server; the browser extension is reloaded manually.
 
 ## Data and persistence
 
@@ -32,8 +33,16 @@ Editor writes are serialized between extension pages with Web Locks. Snapshot ch
 
 All resume content is optional. Format warnings for email, URLs, and phone codes do not prevent saving a draft. Structural errors, unsafe filenames, collisions, invalid entered dates, and reversed interval dates do prevent writes. Missing dates are allowed. Successful Save returns to the dashboard and displays a one-time, dismissible notification naming the file. Placeholder examples are never form values. Country-name entry is free text for now; country-code derivation and image/document controls are deferred. Existing image values and untouched country codes are preserved; changing the country name clears a potentially stale code. User text is inserted as text or input values.
 
+## Debug observation and annotations
+
+`src/debug/collect.ts` is a self-contained function injected into the user-invoked tab in the isolated world. It observes the current DOM, live control state, selected computed styles, and geometry. Accessible frame and shadow-root content has explicit scope boundaries; inaccessible content is recorded as an omission. Original script text, event handlers, known secret attributes, and protected input values are excluded. No asset downloads or site actions are performed.
+
+`model.ts` defines and validates versioned observations and labels. `render.ts` reconstructs an inert HTML view through tag/attribute allowlists and escaping, without copying executable markup or resource URLs. Source CSS and geometry remain in the observation; the HTML uses a consistent, simplified layout with visible native controls and inline links. The viewer uses a sandboxed iframe without script permission; the extension adds its own annotation panels through the same-origin DOM. The viewer fits the available width and places panels in normal document flow. Dropdown option lists/items do not receive separate panels; the hidden-controls list keeps native and custom interactive controls. Previously labeled elements remain editable. The view is approximate, not a replay of the website.
+
+`repository.ts` writes `debug/<name>/capture.json`, `view.html`, and `annotations.json` with collision checks and best-effort rollback of a failed new bundle. Annotations reference stable observation IDs and remain separate from matcher inputs. Saves check the file snapshot for external edits and run under Web Locks. `autosave.ts` serializes writes, retains the latest pending labels after failures, and supports explicit retry. Unsaved labels remain in memory only; navigation warnings are not crash recovery.
+
 ## Validation
 
-`npm test` runs Vitest tests for data transformations, validation, naming, and save/failure decisions using fictional fixtures and a filesystem test double. `npm run build` checks TypeScript and bundles the extension. `npm run check:dist` checks Manifest V3, matching versions, and local assets for all three pages. GitHub Actions runs these checks after installing locked dependencies.
+`npm test` runs Vitest tests for data transformations, validation, naming, capture serialization, inert rendering, and save/failure decisions using fictional fixtures, DOM observation doubles, and a filesystem test double. `npm run build` checks TypeScript and bundles the extension. `npm run check:dist` checks Manifest V3, matching versions, and local assets for all four pages. GitHub Actions runs these checks after installing locked dependencies.
 
 Real file permissions, native prompts, and UI acceptance are tested manually by the owner in Brave. This document describes implemented behavior; future feature scope is tracked in GitHub Issues and the README roadmap.

@@ -6,7 +6,7 @@ CVlization (*CV + civilization*) is a local-first browser companion for job appl
 
 Built as a learning project with TypeScript and browser extensions, with public development on GitHub. Desktop Chromium browsers are the target, with Brave as the primary test browser.
 
-> 🚩 **Current stage: 02 — Local workspace.** Named local resumes, basic details, skills, languages, work experience, education, and optional resume sections are available. Autofill, tracking, and document generation are planned.
+> 🚩 **Current stage: 03 — Profile and autofill.** Local resumes and documents are available. Debug capture and field annotation prepare examples for autofill development; automatic filling, tracking, and document generation are still planned.
 
 ## The idea
 
@@ -32,11 +32,12 @@ The core workflow is intended to run without an account or our own backend. Opti
 - Explicit Save to a named JSON file, filename validation, unsaved-change indication, and detection of files changed since opening.
 - One PDF and one photo per resume, copied into the workspace on Save with matching filenames and local previews. PDF bytes are preserved; PNG/JPEG photos become white-background JPEGs up to 1600 pixels and 2 MB, without retaining the source photo in the workspace.
 - Replace or detach attachments through the editor. Previously saved copies remain on disk; automatic file cleanup is deferred.
+- Capture the current application page through Debug, then label its fields in a local viewer with automatic annotation saving.
 - TypeScript checking and a Vite build for local installation.
 - A build watcher for development and a package sanity check.
 - Vitest business-logic tests and a GitHub Actions workflow that tests and builds the project.
 
-The manifest requests no extension permissions. Workspace access is granted through the browser picker. The extension remembers a directory handle in local browser storage, checks folder availability, and reads and writes user-selected resume files. Resume files are the source of truth; unsaved edits live only in the current page. It makes no network requests and reads no websites. The feature cards describe future work.
+The manifest requests `activeTab` and `scripting` for user-triggered Debug capture of the current website. It has no persistent host permissions or background worker. Workspace access is granted through the browser picker; the directory handle is remembered in local browser storage. Resume files are the source of truth; unsaved edits live only in the current page. The extension makes no network requests or uploads. The feature cards describe future work.
 
 ## Run locally
 
@@ -76,6 +77,14 @@ The folder handle is remembered in this browser. After reopening or restarting, 
 
 The editor handles basic details, skills, languages, work experience, and education. Additional sections are available through **Add section** at the bottom; already-added sections are excluded and the button disables when all seven are present. Empty chosen sections remain visible after saving/reopening. Skill keywords accept a word or phrase followed by Enter; × removes a tag. Text still in the tag input is included on Save. Dates display DD/MM/YYYY and accept manual input or a calendar opened by clicking the field (Alt+Down with the keyboard). MM/YYYY input uses day 01; JSON stores YYYY-MM-DD. Saved highlights and courses reopen with a leading `- ` on each item. Work, education, volunteer, and project intervals allow equal start/end dates and multiple current entries; current entries omit the end date. Standalone award, certificate, and publication dates use the same date input. External JSON Resume import and recovery of unsaved drafts after a crash are planned; navigation warnings are not a backup. The old fictional experiment files are not CVlization resumes and cannot be opened in the new editor.
 
+### Debug captures
+
+Open an application page, add the repeated Work/Education fields you want to study, then choose **Debug this page** in the popup. Enter a unique capture name and choose whether to include current ordinary field values. Passwords, hidden input values, and selected file contents are excluded in either mode; this is not a general personal-data scrubber. Capture only examples you intend to keep locally.
+
+The extension saves `debug/<name>/capture.json`, `view.html`, and `annotations.json` inside the connected workspace and opens the annotation viewer. Plum panels offer field meanings, control kinds, date components, and Work/Education records 1–3. Labels save immediately; check **All labels saved** before closing. **Open debug captures** reopens saved examples. If a write fails, labels stay in the tab for retry; closing the tab loses unsaved labels.
+
+`capture.json` holds the observed DOM tree, attributes, runtime control state, geometry, scope boundaries, and capture metadata. `view.html` is an inert, approximate reconstruction with no site scripts or external resources. Open it independently to inspect the form, or use the extension viewer to annotate and autosave. Annotations never change the observation. Frames the collector cannot access are reported as omissions. Dynamic widgets, subsequent steps, and unloaded options are not replayed: capture each desired state separately.
+
 ## Roadmap
 
 **Legend:** 🚩 current stage · ⬜ upcoming · ✅ completed.
@@ -85,8 +94,8 @@ Keep exactly one flag in the table. When work starts on the next stage, mark the
 | Stage | Status | Outcome |
 | --- | --- | --- |
 | 01 · Foundations | ✅ Completed | Project structure, installable shell, build workflow, and first manual Brave smoke check. |
-| 02 · Local workspace | 🚩 Current | Choose a folder; read/write versioned JSON; reconnect after restart; register documents with relative paths. |
-| 03 · Profile and autofill | ⬜ Upcoming | Edit career history; fill supported forms by click; handle repeated experience blocks and dates on one platform; offer manual field mapping. |
+| 02 · Local workspace | ✅ Completed | Choose a folder; read/write versioned JSON; reconnect after restart; register documents with relative paths. |
+| 03 · Profile and autofill | 🚩 Current | Edit career history; fill supported forms by click; handle repeated experience blocks and dates on one platform; offer manual field mapping. |
 | 04 · Application archive | ⬜ Upcoming | Save vacancies and submission snapshots; track dates, notes, and statuses; browse a fast overview backed by a rebuildable index. |
 | 05 · Cover letters | ⬜ Upcoming | Multiple named/language-specific templates; optional copy-and-paste AI prompt workflow; variable substitution, editing, local PDF generation, and supported file uploads. |
 | 06 · Vacancy assessment | ⬜ Upcoming | Explain skill and requirement matches for an open vacancy, including a LinkedIn-focused assessment workflow where permitted. |
@@ -113,11 +122,13 @@ CVlization/
 ├── scripts/              # Build/package checks
 ├── src/
 │   ├── dashboard/        # Full-tab application UI
+│   ├── debug/            # Static capture, inert viewer, annotation autosave
 │   ├── popup/            # Toolbar popup
 │   ├── resume/           # Editor, model, persistence, and tests
 │   ├── workspace/        # Folder permissions and handle storage
 │   └── shared/           # Shared styling
 ├── dashboard.html
+├── debug.html
 ├── popup.html
 ├── resume.html
 ├── package.json

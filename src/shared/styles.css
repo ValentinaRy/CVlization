@@ -66,6 +66,13 @@ footer p { margin-bottom: 6px; }
 .popup button { width: 100%; padding: 12px 16px; border: 0; border-radius: var(--radius-control); background: var(--color-accent); color: var(--color-on-accent); display: flex; justify-content: space-between; box-shadow: var(--shadow-soft); }
 .popup button:hover { background: var(--color-accent-hover); }
 .popup button:active { box-shadow: none; }
+.popup button + button, .popup form { margin-top:12px; }
+.popup form label { display:block; margin-bottom:6px; }
+.popup form input { width:100%; padding:10px; font:inherit; border:1px solid var(--color-border); border-radius:10px; margin-bottom:10px; }
+.popup form input::placeholder { color:var(--color-placeholder); font-size:.8rem; }
+.popup form .debug-values { display:flex; align-items:center; gap:8px; font-size:.8rem; }
+.popup form input[type="checkbox"] { width:auto; margin:0; }
+.popup form .note { margin-bottom:12px; }
 .note { margin: 14px 0 0; font-size: .75rem; color: var(--color-muted); }
 .note[data-state="error"] { color: var(--color-error); background: var(--color-error-surface); border: 1px solid currentColor; border-radius: var(--radius-control); padding: 12px; }
 @media (max-width: 650px) {
